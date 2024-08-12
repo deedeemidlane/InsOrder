@@ -12,3 +12,83 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Shop {
+  id          Int      @id @default(autoincrement())
+  name        String
+  image       String?
+  accountNo   String
+  accountName String?
+  acqId       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users    User[]
+  products Product[]
+  orders   Order[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  name      String
+  role      Role
+  shopId    Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shop Shop? @relation(fields: [shopId], references: [id])
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Int
+  image     String
+  status    Boolean
+  shopId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderItem OrderItem?
+
+  shop Shop @relation(fields: [shopId], references: [id])
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  customerName String
+  tableNo      Int
+  status       OrderStatus
+  shopId       Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  shop       Shop        @relation(fields: [shopId], references: [id])
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int      @unique
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  SHOP_OWNER
+  STAFF
+}
+
+enum OrderStatus {
+  PROCESSING
+  PREPARING
+  COMPLETED
+}
