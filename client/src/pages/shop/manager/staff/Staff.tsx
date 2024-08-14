@@ -1,4 +1,11 @@
-import { CircleUser, Menu, Store, MoreHorizontal } from "lucide-react";
+import {
+  CircleUser,
+  Menu,
+  Store,
+  MoreHorizontal,
+  ChefHat,
+  Users,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,7 +37,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AddShopModal from "./modals/AddShopModal";
+import { Link } from "react-router-dom";
+import AddStaffModal from "../modals/AddStaffModal";
 
 function formatDate(dateString: string) {
   // Create a new Date object from the string
@@ -47,23 +55,31 @@ function formatDate(dateString: string) {
 
 const templateTableData = [
   {
-    image: "",
-    name: "DeeDeeShop",
-    active: true,
-    manager: "DeeDee",
+    id: 1,
+    name: "Nguyễn Văn A",
+    phone: "0123456789",
+    username: "abcdef",
     createdAt: "2024-08-12T15:47:09.130Z",
   },
   {
-    image: "",
-    name: "Shop2",
-    active: false,
-    manager: "Mia",
+    id: 2,
+    name: "Nguyễn Văn B",
+    phone: "1263784859",
+    username: "xyzabc",
     createdAt: "2024-08-12T15:47:09.130Z",
   },
 ];
 
-export default function AdminPage() {
-  const name = "admin";
+const templateShopData = {
+  shopName: "DeeDeeShop",
+  image: "",
+  accountNo: "21510003888097",
+  acqId: "970401",
+  managerName: "Nguyễn Việt Anh",
+};
+
+export default function StaffManagementPage() {
+  const name = "manager";
 
   const logout = () => {
     console.log("Logged out!");
@@ -74,20 +90,34 @@ export default function AdminPage() {
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <a href="/" className="flex items-center gap-2 font-semibold">
+            <a href="#" className="flex items-center gap-2 font-semibold">
               <img src="/logo.png" className="h-6 w-6" />
-              <span className="">Trang quản lý</span>
+              <span className="">{templateShopData.shopName}</span>
             </a>
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <a
-                href="#"
-                className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+              <Link
+                to="/shop/manager"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
                 <Store className="h-4 w-4" />
-                Danh sách cửa hàng{" "}
-              </a>
+                Thông tin cửa hàng{" "}
+              </Link>
+              <Link
+                to="/shop/manager/menu"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <ChefHat className="h-4 w-4" />
+                Thực đơn
+              </Link>
+              <Link
+                to="/shop/manager/staff"
+                className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+              >
+                <Users className="h-4 w-4" />
+                Nhân viên
+              </Link>
             </nav>
           </div>
         </div>
@@ -114,31 +144,34 @@ export default function AdminPage() {
                   className="flex items-center gap-2 text-lg font-semibold"
                 >
                   <img src="/logo.png" className="h-6 w-6" />
-                  <span className="">Trang quản lý</span>
+                  <span className="">{templateShopData.shopName}</span>
                 </a>
-                <a
-                  href="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
+                <Link
+                  to="/shop/manager"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                 >
                   <Store className="h-4 w-4" />
-                  Danh sách cửa hàng{" "}
-                </a>
+                  Thông tin cửa hàng{" "}
+                </Link>
+                <Link
+                  to="/shop/manager/menu"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <ChefHat className="h-4 w-4" />
+                  Thực đơn
+                </Link>
+                <Link
+                  to="/shop/manager/staff"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
+                >
+                  <Users className="h-4 w-4" />
+                  Nhân viên
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
           {/* Search box */}
-          <div className="w-full flex-1">
-            {/* <form>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
-                />
-              </div>
-            </form> */}
-          </div>
+          <div className="w-full flex-1"></div>
           {/* Avatar button */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -158,61 +191,50 @@ export default function AdminPage() {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 sm:pt-4 md:gap-8">
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle>Danh sách cửa hàng</CardTitle>
+              <CardTitle>Danh sách nhân viên</CardTitle>
               <CardDescription>
-                Theo dõi các cửa hàng đã đăng ký trên hệ thống.
+                Quản lý tài khoản nhân viên tại đây.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
                 <div className="flex items-center gap-2 mb-4">
-                  <AddShopModal />
+                  <AddStaffModal />
                 </div>
               </div>
               <Card>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="hidden w-[100px] sm:table-cell">
-                        <span className="sr-only">Image</span>
+                      <TableHead className="text-center w-[50px]">
+                        STT
                       </TableHead>
-                      <TableHead>Tên cửa hàng</TableHead>
+                      <TableHead>Tên nhân viên</TableHead>
                       <TableHead className="hidden lg:table-cell">
-                        Trạng thái
+                        Số điện thoại
                       </TableHead>
-                      <TableHead>Quản lý</TableHead>
+                      <TableHead>Tên đăng nhập</TableHead>
                       <TableHead className="hidden md:table-cell">
                         Ngày tạo
                       </TableHead>
-
                       <TableHead>
                         <span className="sr-only">Actions</span>
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {templateTableData.map((shop) => (
-                      <TableRow>
-                        <TableCell className="hidden sm:table-cell">
-                          <img
-                            alt="Ảnh đại diện Shop"
-                            className="aspect-square rounded-md object-cover"
-                            height="64"
-                            src={shop.image}
-                            width="64"
-                          />
+                    {templateTableData.map((shop, index) => (
+                      <TableRow key={shop.id}>
+                        <TableCell className="hidden sm:table-cell text-center">
+                          {index + 1}
                         </TableCell>
                         <TableCell className="font-medium">
                           {shop.name}
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          {shop.active ? (
-                            <Badge variant="active">Hoạt động</Badge>
-                          ) : (
-                            <Badge variant="destructive">Tạm dừng</Badge>
-                          )}
+                        <TableCell className="hidden md:table-cell">
+                          {shop.phone}
                         </TableCell>
-                        <TableCell>{shop.manager}</TableCell>
+                        <TableCell>{shop.username}</TableCell>
                         <TableCell className="hidden md:table-cell">
                           {formatDate(shop.createdAt)}
                         </TableCell>

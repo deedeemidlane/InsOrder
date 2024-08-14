@@ -165,6 +165,7 @@ export default function AdminSamplePage() {
               </nav>
             </SheetContent>
           </Sheet>
+          SearchBox
           <div className="w-full flex-1">
             <form>
               <div className="relative">

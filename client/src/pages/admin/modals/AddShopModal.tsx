@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/input-otp";
 import { PlusCircle } from "lucide-react";
 
-export function AddShopModal() {
+export default function AddShopModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
