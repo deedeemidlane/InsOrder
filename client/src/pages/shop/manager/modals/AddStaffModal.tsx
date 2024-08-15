@@ -12,13 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { REGEXP_ONLY_DIGITS } from "input-otp";
-
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
 import { PlusCircle } from "lucide-react";
 
 export default function AddStaffModal() {
@@ -37,61 +30,25 @@ export default function AddStaffModal() {
           <DialogTitle className="">Tạo tài khoản</DialogTitle>
         </DialogHeader>
         <div className="max-h-[500px] overflow-auto">
-          {/* <hr />
+          <hr />
           <div className="grid gap-4 py-4 sm:px-2">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="shopName" className="text-right">
-                Tên
+              <Label htmlFor="staffName" className="text-right">
+                Tên nhân viên
               </Label>
               <Input
-                id="shopName"
+                id="staffName"
                 className="col-span-3"
-                placeholder="Nhập tên cửa hàng"
+                placeholder="Nhập tên nhân viên"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">
-                Ảnh đại diện
+              <Label htmlFor="phone" className="text-right">
+                Số điện thoại
               </Label>
-              <Input id="image" className="col-span-3 p-0" type="file" />
+              <Input id="phone" className="col-span-3" type="tel" />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="accountNo" className="text-right">
-                Số tài khoản
-              </Label>
-              <Input id="accountNo" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="BIN" className="text-right">
-                Mã BIN ngân hàng
-              </Label>
-              <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS}>
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-          </div>
-          <hr />
-          <h3 className="text-md mt-2 font-bold text-cyan-700">
-            Thông tin quản lý
-          </h3>
-          <div className="grid gap-4 py-4  sm:px-2">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="managerName" className="text-right">
-                Tên
-              </Label>
-              <Input
-                id="managerName"
-                className="col-span-3"
-                placeholder="Nhập tên quản lý"
-              />
-            </div>
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="username" className="text-right">
                 Tên đăng nhập
@@ -104,7 +61,7 @@ export default function AddStaffModal() {
               </Label>
               <Input id="password" className="col-span-3" type="password" />
             </div>
-          </div> */}
+          </div>
         </div>
         <DialogFooter>
           <DialogClose asChild>

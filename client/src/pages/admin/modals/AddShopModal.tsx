@@ -94,6 +94,12 @@ export default function AddShopModal() {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phone" className="text-right">
+                Số điện thoại
+              </Label>
+              <Input id="phone" className="col-span-3" type="tel" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="username" className="text-right">
                 Tên đăng nhập
               </Label>
