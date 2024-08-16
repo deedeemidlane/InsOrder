@@ -4,7 +4,7 @@ import heroImg from "/hero.png";
 function HomePage() {
   return (
     <>
-      <header className="fixed top-0 w-full  z-30 bg-white-500 transition-all">
+      <header className="fixed top-0 w-full  z-30 bg-white transition-all">
         <nav className="max-w-screen-xl px-6 sm:px-8 lg:px-16 mx-auto grid grid-flow-col py-3 sm:py-4">
           <div className="col-start-1 col-end-2 flex items-center">
             <img className="h-12 w-auto" src={logo} alt="logo" />
@@ -17,7 +17,7 @@ function HomePage() {
           </div>
           <div className="col-start-10 col-end-12 font-medium flex justify-end items-center">
             <a href="/login">
-              <button className="font-medium tracking-wide py-2 px-5 sm:px-8 border border-red-500 text-red-500 bg-white-500 outline-none rounded-l-full rounded-r-full capitalize hover:bg-red-500 hover:text-white transition-all hover:shadow-lg hover:shadow-red-300">
+              <button className="font-medium tracking-wide py-2 px-5 sm:px-8 border border-red-500 text-red-500 bg-white outline-none rounded-l-full rounded-r-full capitalize hover:bg-red-500 hover:text-white transition-all hover:shadow-lg hover:shadow-red-300">
                 {" "}
                 Đăng nhập
               </button>

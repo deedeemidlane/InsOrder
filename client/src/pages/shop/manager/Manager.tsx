@@ -209,7 +209,7 @@ export default function ManagerPage() {
                     <div className="grid grid-cols-4 gap-4 mb-4">
                       <div>
                         <img
-                          alt="Product image"
+                          alt="Shop image"
                           className="aspect-square w-full rounded-full border-2 object-cover"
                           height="84"
                           src="/hero.png"
