@@ -12,14 +12,12 @@ import {
 } from "@/components/ui/card";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Table,
@@ -29,8 +27,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddShopModal from "./modals/AddShopModal";
+import useLogout from "@/hooks/useLogout";
+import { useAuthContext } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function formatDate(dateString: string) {
   // Create a new Date object from the string
@@ -63,11 +64,20 @@ const templateTableData = [
 ];
 
 export default function AdminPage() {
+  const { authUser } = useAuthContext();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authUser?.role !== "ADMIN") {
+      navigate("/login");
+    }
+  }, [authUser]);
+
   const name = "admin";
 
-  const logout = () => {
-    console.log("Logged out!");
-  };
+  const { logout } = useLogout();
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       {/* Sidebar */}
@@ -151,7 +161,14 @@ export default function AdminPage() {
               <DropdownMenuLabel>{name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
-              <DropdownMenuItem onClick={logout}>Đăng xuất</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+              >
+                Đăng xuất
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
@@ -191,8 +208,8 @@ export default function AdminPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {templateTableData.map((shop) => (
-                      <TableRow>
+                    {templateTableData.map((shop, index) => (
+                      <TableRow key={index}>
                         <TableCell className="hidden sm:table-cell">
                           <img
                             alt="Ảnh đại diện Shop"

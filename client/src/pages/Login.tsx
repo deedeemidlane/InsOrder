@@ -1,13 +1,46 @@
-import { useState } from "react";
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import { useEffect, useState } from "react";
+import { Button, Checkbox, Label, Spinner, TextInput } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
+import useLogin from "@/hooks/useLogin";
+import { useAuthContext } from "@/context/AuthContext";
 
 export default function LoginPage() {
+  const { authUser } = useAuthContext();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    switch (authUser?.role) {
+      case "ADMIN":
+        navigate("/admin");
+        break;
+      case "MANAGER":
+        navigate("/shop/manager");
+        break;
+      case "STAFF":
+        navigate("/shop/staff");
+        break;
+      default:
+        break;
+    }
+  }, [authUser]);
+
   const [showPassword, setShowPassword] = useState(false);
 
+  const [inputs, setInputs] = useState({
+    username: "",
+    password: "",
+  });
+
+  const { loading, login } = useLogin();
+
+  const handleSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    login(inputs.username, inputs.password);
+  };
+
   return (
-    <main
-      className={`flex h-screen align-middle sm:bg-[url('/login-background.jpg')]`}
-    >
+    <main className="flex h-screen align-middle">
       <div className="m-auto w-96 rounded-lg border-gray-500 bg-white/90 p-5 shadow-lg dark:bg-zinc-800 dark:sm:border-4">
         <a href="/" className="my-10 flex justify-center">
           <img src="/logo.png" className="mr-2 h-10 w-10" />
@@ -15,21 +48,24 @@ export default function LoginPage() {
             InsOrder
           </span>
         </a>
-        <p className="mb-3 font-bold text-red-600 dark:text-red-400">
-          {/* {actionData} */}
-        </p>
-        <form className="flex max-w-md flex-col gap-4" method="post">
+        <form
+          className="flex max-w-md flex-col gap-4"
+          method="post"
+          onSubmit={handleSubmitForm}
+        >
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="email" value="Tên đăng nhập" />
+              <Label htmlFor="username" value="Tên đăng nhập" />
             </div>
             <TextInput
-              id="email"
+              id="username"
               type="text"
               required
               shadow
-              name="username"
               placeholder="Nhập tên đăng nhập"
+              onChange={(e) =>
+                setInputs({ ...inputs, username: e.target.value })
+              }
             />
           </div>
           <div>
@@ -41,8 +77,10 @@ export default function LoginPage() {
               type={showPassword ? "text" : "password"}
               required
               shadow
-              name="password"
               placeholder="∗∗∗∗∗∗∗∗∗"
+              onChange={(e) =>
+                setInputs({ ...inputs, password: e.target.value })
+              }
             />
           </div>
 
@@ -62,8 +100,13 @@ export default function LoginPage() {
             className="mb-10 mt-5"
             gradientMonochrome="failure"
             type="submit"
+            disabled={loading}
           >
-            Đăng nhập
+            {loading ? (
+              <Spinner aria-label="Spinner button example" size="sm" />
+            ) : (
+              "Đăng nhập"
+            )}
           </Button>
         </form>
       </div>

@@ -1,4 +1,9 @@
-import { Route, Routes } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
 import HomePage from "./pages/Home";
 import LoginPage from "./pages/Login";
 import AdminPage from "./pages/admin/Admin";
@@ -13,10 +18,11 @@ import CartPage from "./pages/shop/customer/Cart";
 import ConfirmPaymentPage from "./pages/shop/customer/ConfirmPayment";
 import QrPaymentPage from "./pages/shop/customer/QrPayment";
 import AfterPaymentPage from "./pages/shop/customer/AfterPayment";
+import { useAuthContext } from "./context/AuthContext";
 
-function App() {
-  return (
-    <Routes>
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/admin" element={<AdminPage />} />
@@ -35,8 +41,16 @@ function App() {
         <Route path="qr-pay" element={<QrPaymentPage />} />
         <Route path="after-payment" element={<AfterPaymentPage />} />
       </Route>
-    </Routes>
-  );
+    </>,
+  ),
+);
+
+function App() {
+  const { isLoading } = useAuthContext();
+
+  if (isLoading) return null;
+
+  return <RouterProvider router={router} />;
 }
 
 export default App;

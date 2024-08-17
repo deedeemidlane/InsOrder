@@ -1,6 +1,7 @@
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -10,6 +11,13 @@ const port = 3001;
 
 app.use(cookieParser()); // for parsing cookie
 app.use(express.json()); // for parsing application/json
+
+app.use(
+  cors({
+    origin: "*",
+    optionsSuccessStatus: 200,
+  }),
+);
 
 app.use("/api/auth", authRoutes);
 

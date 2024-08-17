@@ -20,6 +20,7 @@ model Shop {
   accountNo   String
   accountName String?
   acqId       String
+  active      Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -33,6 +34,7 @@ model User {
   username  String   @unique
   password  String
   name      String
+  tel       String?
   role      Role
   shopId    Int?
   createdAt DateTime @default(now())
@@ -83,12 +85,13 @@ model OrderItem {
 
 enum Role {
   ADMIN
-  SHOP_OWNER
+  MANAGER
   STAFF
 }
 
 enum OrderStatus {
   PROCESSING
+  CONFIRMED
   PREPARING
   COMPLETED
 }
