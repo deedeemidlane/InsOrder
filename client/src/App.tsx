@@ -1,9 +1,4 @@
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-  RouterProvider,
-} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/Home";
 import LoginPage from "./pages/Login";
 import AdminPage from "./pages/admin/Admin";
@@ -20,16 +15,43 @@ import QrPaymentPage from "./pages/shop/customer/QrPayment";
 import AfterPaymentPage from "./pages/shop/customer/AfterPayment";
 import { useAuthContext } from "./context/AuthContext";
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
+function App() {
+  const { authUser, isLoading } = useAuthContext();
+
+  if (isLoading) return null;
+
+  return (
+    <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/shop/manager">
-        <Route index element={<ManagerPage />} />
-        <Route path="menu" element={<MenuManagementPage />} />
-        <Route path="staff" element={<StaffManagementPage />} />
+        <Route
+          index
+          element={
+            authUser?.role !== "MANAGER" ? <LoginPage /> : <ManagerPage />
+          }
+        />
+        <Route
+          path="menu"
+          element={
+            authUser?.role !== "MANAGER" ? (
+              <LoginPage />
+            ) : (
+              <MenuManagementPage />
+            )
+          }
+        />
+        <Route
+          path="staff"
+          element={
+            authUser?.role !== "MANAGER" ? (
+              <LoginPage />
+            ) : (
+              <StaffManagementPage />
+            )
+          }
+        />
       </Route>
       <Route path="/shop/staff" element={<StaffPage />} />
       <Route path="/shop/public/:shopName">
@@ -41,16 +63,8 @@ const router = createBrowserRouter(
         <Route path="qr-pay" element={<QrPaymentPage />} />
         <Route path="after-payment" element={<AfterPaymentPage />} />
       </Route>
-    </>,
-  ),
-);
-
-function App() {
-  const { isLoading } = useAuthContext();
-
-  if (isLoading) return null;
-
-  return <RouterProvider router={router} />;
+    </Routes>
+  );
 }
 
 export default App;

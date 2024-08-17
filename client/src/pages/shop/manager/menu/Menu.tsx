@@ -13,20 +13,17 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Table,
@@ -36,65 +33,63 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AddDishModal from "../modals/AddDishModal";
+import { useAuthContext } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
+import useLogout from "@/hooks/useLogout";
+import useGetMenu from "@/hooks/manager/useGetMenu";
+import { formatDate, formatPriceInVND } from "@/utils/helperFunctions";
+import { Spinner } from "flowbite-react";
+import useCreateDish from "@/hooks/manager/useCreateDish";
 
-function formatDate(dateString: string) {
-  // Create a new Date object from the string
-  const date = new Date(dateString);
-
-  // Extract the day, month, and year from the date
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-  const year = date.getFullYear();
-
-  // Format the date as dd/mm/yyyy
-  return `${day}/${month}/${year}`;
-}
-
-function formatPriceInVND(price: number) {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price);
-}
-
-const templateTableData = [
-  {
-    id: 1,
-    image: "",
-    name: "Americano",
-    price: 50000,
-    status: true,
-    createdAt: "2024-08-12T15:47:09.130Z",
-  },
-  {
-    id: 2,
-    image: "",
-    name: "Trà đào cam sả",
-    price: 55000,
-    status: false,
-    createdAt: "2024-08-12T15:47:09.130Z",
-  },
-];
-
-const templateShopData = {
-  shopName: "DeeDeeShop",
-  image: "/logo.png",
-  accountNo: "21510003888097",
-  acqId: "970401",
-  isActive: false,
-  managerName: "Nguyễn Việt Anh",
-  managerUsername: "deedee",
+type Product = {
+  id: number;
+  image: string;
+  name: string;
+  price: number;
+  status: boolean;
+  createdAt: string;
 };
 
 export default function MenuManagementPage() {
-  const name = "manager";
+  const { authUser } = useAuthContext();
 
-  const logout = () => {
-    console.log("Logged out!");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authUser?.role !== "MANAGER") {
+      navigate("/login");
+    }
+  }, [authUser]);
+
+  const { logout } = useLogout();
+
+  const { loading: getMenuLoading, getMenu } = useGetMenu();
+  const { loading: createDishLoading, createDish } = useCreateDish();
+
+  const [menu, setMenu] = useState<Product[]>([]);
+
+  const [openAddDishModal, setOpenAddDishModal] = useState(false);
+
+  const handleSubmitForm = async (e: React.FormEvent, inputs: {}) => {
+    e.preventDefault();
+
+    await createDish(inputs);
+
+    setOpenAddDishModal(false);
+
+    // setMenu([]);
   };
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const fetchedMenu = await getMenu();
+      setMenu(fetchedMenu);
+    };
+
+    fetchMenu();
+  }, [createDishLoading]);
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       {/* Sidebar */}
@@ -103,7 +98,7 @@ export default function MenuManagementPage() {
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <a href="#" className="flex items-center gap-2 font-semibold">
               <img src="/logo.png" className="h-6 w-6" />
-              <span className="">{templateShopData.shopName}</span>
+              <span className="">Trang quản lý</span>
             </a>
           </div>
           <div className="flex-1">
@@ -155,7 +150,7 @@ export default function MenuManagementPage() {
                   className="flex items-center gap-2 text-lg font-semibold"
                 >
                   <img src="/logo.png" className="h-6 w-6" />
-                  <span className="">{templateShopData.shopName}</span>
+                  <span className="">Trang quản lý</span>
                 </a>
                 <Link
                   to="/shop/manager"
@@ -192,7 +187,7 @@ export default function MenuManagementPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{name}</DropdownMenuLabel>
+              <DropdownMenuLabel>{authUser?.name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
               <DropdownMenuItem onClick={logout}>Đăng xuất</DropdownMenuItem>
@@ -208,90 +203,103 @@ export default function MenuManagementPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center">
-                <div className="flex items-center gap-2 mb-4">
-                  <AddDishModal />
+              {getMenuLoading ? (
+                <div className="w-full text-center">
+                  <Spinner size="lg" />
                 </div>
-              </div>
-              <Card>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="hidden w-[120px] sm:table-cell">
-                        <span className="sr-only">Image</span>
-                      </TableHead>
-                      <TableHead>Tên món</TableHead>
-                      <TableHead>Giá</TableHead>
-                      <TableHead className="hidden lg:table-cell">
-                        Trạng thái
-                      </TableHead>
-
-                      <TableHead className="hidden md:table-cell">
-                        Ngày tạo
-                      </TableHead>
-
-                      <TableHead>
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {templateTableData.map((shop) => (
-                      <TableRow key={shop.id}>
-                        <TableCell className="hidden sm:table-cell">
-                          <img
+              ) : (
+                <>
+                  <div className="flex items-center">
+                    <div className="flex items-center gap-2 mb-4">
+                      <AddDishModal
+                        handleSubmitForm={handleSubmitForm}
+                        open={openAddDishModal}
+                        setOpen={setOpenAddDishModal}
+                        loading={createDishLoading}
+                      />
+                    </div>
+                  </div>
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="hidden lg:w-[100px] sm:table-cell">
+                            <span className="sr-only">Image</span>
+                          </TableHead>
+                          <TableHead>Tên món</TableHead>
+                          <TableHead>Giá</TableHead>
+                          <TableHead className="hidden lg:table-cell">
+                            Trạng thái
+                          </TableHead>
+                          <TableHead className="hidden xl:table-cell">
+                            Ngày tạo
+                          </TableHead>
+                          <TableHead>
+                            <span className="sr-only">Actions</span>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {menu.map((product) => (
+                          <TableRow key={product.id}>
+                            <TableCell className="hidden sm:table-cell">
+                              {/* <img
                             alt="Ảnh minh họa món"
                             className="aspect-square rounded-md object-cover"
                             height="64"
-                            src={shop.image}
+                            src={product.image}
                             width="64"
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {shop.name}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {formatPriceInVND(shop.price)}
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          {shop.status ? (
-                            <Badge variant="active">Còn hàng</Badge>
-                          ) : (
-                            <Badge variant="destructive">Hết hàng</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {formatDate(shop.createdAt)}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                              <DropdownMenuItem>Xóa</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
+                          /> */}
+                              <img
+                                alt="Ảnh minh họa món"
+                                className="aspect-square rounded-md object-cover"
+                                height="64"
+                                src="/placeholder.svg"
+                                width="64"
+                              />
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {product.name}
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {formatPriceInVND(product.price)}
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell">
+                              {product.status ? (
+                                <Badge variant="active">Còn hàng</Badge>
+                              ) : (
+                                <Badge variant="destructive">Hết hàng</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="hidden xl:table-cell">
+                              {formatDate(product.createdAt)}
+                            </TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    aria-haspopup="true"
+                                    size="icon"
+                                    variant="ghost"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">Toggle menu</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+                                  <DropdownMenuItem>Xóa</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </>
+              )}
             </CardContent>
-            <CardFooter>
-              {/* <div className="text-xs text-muted-foreground">
-                Showing <strong>1-10</strong> of <strong>32</strong> products
-              </div> */}
-            </CardFooter>
           </Card>
         </main>
       </div>

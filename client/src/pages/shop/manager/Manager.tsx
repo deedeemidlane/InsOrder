@@ -1,16 +1,5 @@
-import {
-  CircleUser,
-  Menu,
-  Store,
-  MoreHorizontal,
-  ChefHat,
-  Users,
-  ChevronLeft,
-  PlusCircle,
-  Upload,
-} from "lucide-react";
+import { CircleUser, Menu, Store, ChefHat, Users } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -31,16 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -51,8 +30,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Textarea } from "@/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   InputOTP,
   InputOTPGroup,
@@ -60,36 +37,52 @@ import {
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import ChangePasswordModal from "./modals/ChangePasswordModal";
+import { useAuthContext } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
+import useLogout from "@/hooks/useLogout";
+import useGetShopInfo from "@/hooks/manager/useGetShopInfo";
 
-function formatDate(dateString: string) {
-  // Create a new Date object from the string
-  const date = new Date(dateString);
-
-  // Extract the day, month, and year from the date
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-  const year = date.getFullYear();
-
-  // Format the date as dd/mm/yyyy
-  return `${day}/${month}/${year}`;
-}
-
-const templateShopData = {
-  shopName: "DeeDeeShop",
-  image: "/logo.png",
-  accountNo: "21510003888097",
-  acqId: "970401",
-  isActive: false,
-  managerName: "Nguyễn Việt Anh",
-  managerUsername: "deedee",
+type ShopType = {
+  name: string;
+  username: string;
+  shop: {
+    id: number;
+    name: string;
+    image: string;
+    accountNo: string;
+    acqId: string;
+    shopUrl: string;
+    active: boolean;
+    createdAt: string;
+  };
 };
 
 export default function ManagerPage() {
-  const name = "manager";
+  const { authUser } = useAuthContext();
 
-  const logout = () => {
-    console.log("Logged out!");
-  };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authUser?.role !== "MANAGER") {
+      navigate("/login");
+    }
+  }, [authUser]);
+
+  const { logout } = useLogout();
+
+  const { getShopInfo } = useGetShopInfo();
+
+  const [shopInfo, setShopInfo] = useState<ShopType>();
+
+  useEffect(() => {
+    const fetchShop = async () => {
+      const fetchedShop = await getShopInfo();
+      setShopInfo(fetchedShop);
+    };
+
+    fetchShop();
+  }, []);
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] xl:grid-cols-[280px_1fr]">
       {/* Sidebar */}
@@ -98,7 +91,7 @@ export default function ManagerPage() {
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <a href="#" className="flex items-center gap-2 font-semibold">
               <img src="/logo.png" className="h-6 w-6" />
-              <span className="">{templateShopData.shopName}</span>
+              <span className="">Trang quản lý</span>
             </a>
           </div>
           <div className="flex-1">
@@ -150,7 +143,7 @@ export default function ManagerPage() {
                   className="flex items-center gap-2 text-lg font-semibold"
                 >
                   <img src="/logo.png" className="h-6 w-6" />
-                  <span className="">{templateShopData.shopName}</span>
+                  <span className="">{shopInfo?.shop.name}</span>
                 </a>
                 <Link
                   to="/shop/manager"
@@ -187,7 +180,7 @@ export default function ManagerPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>{name}</DropdownMenuLabel>
+              <DropdownMenuLabel>{authUser?.name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
               <DropdownMenuItem onClick={logout}>Đăng xuất</DropdownMenuItem>
@@ -216,9 +209,9 @@ export default function ManagerPage() {
                           width="84"
                         />
                       </div>
-                      <div className="flex items-center">
+                      <div className="flex items-center col-span-2">
                         <h1 className="font-semibold text-xl">
-                          {templateShopData.shopName}
+                          {shopInfo?.shop.name}
                         </h1>
                       </div>
                     </div>
@@ -231,10 +224,10 @@ export default function ManagerPage() {
                           id="shopName"
                           className="col-span-3"
                           placeholder="Nhập tên cửa hàng"
-                          defaultValue={templateShopData.shopName}
+                          defaultValue={shopInfo?.shop.name}
                         />
                       </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
+                      {/* <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="image" className="text-right">
                           Ảnh đại diện
                         </Label>
@@ -243,7 +236,7 @@ export default function ManagerPage() {
                           className="col-span-3 p-0"
                           type="file"
                         />
-                      </div>
+                      </div> */}
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="accountNo" className="text-right">
                           Số tài khoản
@@ -251,7 +244,7 @@ export default function ManagerPage() {
                         <Input
                           id="accountNo"
                           className="col-span-3"
-                          defaultValue={templateShopData.accountNo}
+                          defaultValue={shopInfo?.shop.accountNo}
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
@@ -261,7 +254,7 @@ export default function ManagerPage() {
                         <InputOTP
                           maxLength={6}
                           pattern={REGEXP_ONLY_DIGITS}
-                          defaultValue={templateShopData.acqId}
+                          value={shopInfo?.shop.acqId}
                         >
                           <InputOTPGroup>
                             <InputOTPSlot index={0} />
@@ -278,16 +271,14 @@ export default function ManagerPage() {
                           Trạng thái
                         </Label>
                         <div className="col-span-3">
-                          <Select
-                            defaultValue={templateShopData.isActive ? "1" : "0"}
-                          >
+                          <Select value={shopInfo?.shop.active ? "1" : "0"}>
                             <SelectTrigger
                               id="status"
                               aria-label="Select status"
                             >
                               <SelectValue placeholder="Lựa chọn trạng thái" />
                             </SelectTrigger>
-                            <SelectContent defaultValue="0">
+                            <SelectContent>
                               <SelectItem value="1">Hoạt động</SelectItem>
                               <SelectItem value="0">Tạm dừng</SelectItem>
                             </SelectContent>
@@ -321,7 +312,7 @@ export default function ManagerPage() {
                           id="managerName"
                           className="col-span-3"
                           placeholder="Nhập tên quản lý"
-                          defaultValue={templateShopData.managerName}
+                          defaultValue={shopInfo?.name}
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
@@ -331,7 +322,7 @@ export default function ManagerPage() {
                         <Input
                           id="username"
                           className="col-span-3"
-                          defaultValue={templateShopData.managerUsername}
+                          defaultValue={shopInfo?.username}
                         />
                       </div>
                     </div>
