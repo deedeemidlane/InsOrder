@@ -36,7 +36,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AddStaffModal from "../modals/AddStaffModal";
 import { useAuthContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import useLogout from "@/hooks/useLogout";
+import useLogout from "@/hooks/authentication/useLogout";
 import useGetStaffs from "@/hooks/manager/useGetStaffs";
 import { formatDate } from "@/utils/helperFunctions";
 import useCreateStaffAccount from "@/hooks/manager/useCreateStaffAccount";

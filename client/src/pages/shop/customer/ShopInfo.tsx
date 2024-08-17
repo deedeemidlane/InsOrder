@@ -1,11 +1,49 @@
 import { Badge } from "@/components/ui/badge";
+import useGetMenu from "@/hooks/customer/useGetMenu";
 import { Button } from "flowbite-react";
 import { Info, Search, ShoppingCart, Utensils } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
 export default function ShopInfoPage() {
-  const { shopName } = useParams();
-  console.log(shopName);
+  const { shopUrl } = useParams();
+
+  const { getMenu } = useGetMenu();
+
+  const [shopName, setShopName] = useState("");
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const fetchedMenu = await getMenu(shopUrl);
+      console.log(fetchedMenu);
+
+      setShopName(fetchedMenu.shopName);
+    };
+
+    fetchMenu();
+  }, []);
+
+  const [cart, setCart] = useState<
+    {
+      id: number;
+      name: string | undefined;
+      price: number | undefined;
+      quantity: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    try {
+      const key = shopUrl ? shopUrl : "";
+      const localCart = localStorage.getItem(key);
+
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   return (
     <>
@@ -19,7 +57,7 @@ export default function ShopInfoPage() {
                 src="/hero.png"
               />
               <div className="flex items-center">
-                <h1 className="font-semibold text-xl">DeeDeeShop</h1>
+                <h1 className="font-semibold md:text-xl">{shopName}</h1>
               </div>
             </div>
           </div>
@@ -48,7 +86,13 @@ export default function ShopInfoPage() {
               <Button outline gradientMonochrome="failure">
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 <span className="hidden sm:inline mr-2">Giỏ hàng</span>
-                <Badge>6</Badge>
+                <Badge>
+                  {cart.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.quantity,
+                    0,
+                  )}
+                </Badge>
               </Button>
             </Link>
           </div>

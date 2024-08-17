@@ -1,57 +1,90 @@
-import { Button } from "flowbite-react";
+import { Button, Spinner } from "flowbite-react";
 import { Info, Search, ShoppingCart, Utensils } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Button as FlowbiteButton, Card as FlowbiteCard } from "flowbite-react";
 import { formatPriceInVND } from "@/utils/helperFunctions";
 import { BiSolidCartAdd } from "react-icons/bi";
 import { Badge } from "@/components/ui/badge";
+import useGetMenu from "@/hooks/customer/useGetMenu";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-const templateMenuDate = [
-  {
-    id: "1",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-  {
-    id: "2",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-  {
-    id: "3",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-  {
-    id: "4",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-  {
-    id: "5",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-  {
-    id: "6",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-  {
-    id: "7",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-  {
-    id: "8",
-    name: "Trà đào cam sả",
-    price: 55000,
-  },
-];
+type TProduct = {
+  id: number;
+  image: string;
+  name: string;
+  price: number;
+  status: boolean;
+  createdAt: string;
+};
 
 export default function MenuPage() {
-  const { shopName } = useParams();
-  console.log(shopName);
+  const { shopUrl } = useParams();
+
+  const { loading, getMenu } = useGetMenu();
+
+  const [menu, setMenu] = useState<TProduct[]>([]);
+  const [shopName, setShopName] = useState("");
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const fetchedMenu = await getMenu(shopUrl);
+      console.log(fetchedMenu);
+
+      setMenu(fetchedMenu.products);
+      setShopName(fetchedMenu.shopName);
+    };
+
+    fetchMenu();
+  }, []);
+
+  const [cart, setCart] = useState<
+    {
+      id: number;
+      name: string | undefined;
+      price: number | undefined;
+      quantity: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    try {
+      const key = shopUrl ? shopUrl : "";
+      const localCart = localStorage.getItem(key);
+
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const addToCart = (id: number) => {
+    let temp = [...cart];
+
+    const product = menu.find((e) => e.id === id);
+
+    const index = temp.findIndex((e) => e.id === id);
+
+    if (index !== -1) {
+      temp[index] = { ...temp[index], quantity: temp[index].quantity + 1 };
+    } else {
+      temp.push({
+        id: id,
+        name: product?.name,
+        price: product?.price,
+        quantity: 1,
+      });
+    }
+
+    const key = shopUrl ? shopUrl : "";
+    localStorage.setItem(key, JSON.stringify(temp));
+
+    setCart(temp);
+
+    toast.success("Thêm món thành công!");
+  };
 
   return (
     <>
@@ -65,7 +98,7 @@ export default function MenuPage() {
                 src="/hero.png"
               />
               <div className="flex items-center">
-                <h1 className="font-semibold text-xl">DeeDeeShop</h1>
+                <h1 className="font-semibold md:text-xl">{shopName}</h1>
               </div>
             </div>
           </div>
@@ -94,7 +127,13 @@ export default function MenuPage() {
               <Button outline gradientMonochrome="failure">
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 <span className="hidden sm:inline mr-2">Giỏ hàng</span>
-                <Badge>6</Badge>
+                <Badge>
+                  {cart.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.quantity,
+                    0,
+                  )}
+                </Badge>
               </Button>
             </Link>
           </div>
@@ -132,31 +171,43 @@ export default function MenuPage() {
       {/* End Mobile Navigation */}
 
       {/* Main content */}
-      <div className="flex justify-center items-center my-20">
-        <div className="grid md:grid-cols-2 gap-4 xl:gap-8 my-4">
-          {templateMenuDate.map((product) => (
-            <FlowbiteCard className="sm:pr-8" key={product.id}>
-              <div className="flex gap-4">
-                <img
-                  src="/placeholder.svg"
-                  alt="product image"
-                  className="h-24 w-24 object-cover border-2 rounded-md"
-                />
-                <div className="flex flex-col justify-between">
-                  <h3 className="text-xl font-semibold">{product.name}</h3>
-                  <p>{formatPriceInVND(product.price)}</p>
-                  <FlowbiteButton size="xs" outline>
-                    <div className="flex items-center">
-                      <BiSolidCartAdd className="sm:mr-1 text-xl" />
-                      <span>Thêm vào giỏ hàng</span>
+      {loading ? (
+        <main className="flex h-screen items-center justify-center">
+          <Spinner size="xl" color="failure" />
+        </main>
+      ) : (
+        <div className="flex justify-center items-center my-20">
+          <div className="grid md:grid-cols-2 gap-4 xl:gap-8 my-4">
+            {menu?.map((product) => (
+              <FlowbiteCard className="sm:pr-8" key={product.id}>
+                <div className="flex gap-4">
+                  <img
+                    src="/placeholder.svg"
+                    alt="product image"
+                    className="h-24 w-24 object-cover border-2 rounded-md"
+                  />
+                  <div className="flex flex-col justify-between">
+                    <h3 className="text-xl font-semibold">{product.name}</h3>
+                    <p>{formatPriceInVND(product.price)}</p>
+                    <div>
+                      <FlowbiteButton
+                        size="xs"
+                        outline
+                        onClick={() => addToCart(product.id)}
+                      >
+                        <div className="flex items-center">
+                          <BiSolidCartAdd className="sm:mr-1 text-xl" />
+                          <span>Thêm vào giỏ hàng</span>
+                        </div>
+                      </FlowbiteButton>
                     </div>
-                  </FlowbiteButton>
+                  </div>
                 </div>
-              </div>
-            </FlowbiteCard>
-          ))}
+              </FlowbiteCard>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

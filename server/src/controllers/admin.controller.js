@@ -112,7 +112,7 @@ export const getShops = async (req, res) => {
       res.status(404).json({ error: "Không tìm thấy tài nguyên" });
     }
   } catch (error) {
-    console.log("Error in createShop controller: ", error.message);
+    console.log("Error in getShops controller: ", error.message);
     res.status(500).json({ error: "Lỗi hệ thống" });
   }
 };

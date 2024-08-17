@@ -2,6 +2,8 @@ import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import managerRoutes from "./routes/manager.route.js";
+import staffRoutes from "./routes/staff.route.js";
+import customerRoutes from "./routes/customer.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -24,6 +26,8 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/manager", managerRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/customer", customerRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

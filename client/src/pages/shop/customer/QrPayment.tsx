@@ -1,10 +1,151 @@
-import { ShoppingCart, Utensils, Search, Info } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button as FlowbiteButton } from "flowbite-react";
+import { ShoppingCart, Utensils, Search, Info, Download } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Button as FlowbiteButton, Spinner } from "flowbite-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import useGetShopInfo from "@/hooks/customer/useGetShopInfo";
+import usePlaceOrder from "@/hooks/customer/usePlaceOrder";
+// import axios from "axios";
+
+type TShop = {
+  id: number;
+  name: string;
+  image: string;
+  accountNo: string;
+  accountName: string;
+  acqId: string;
+  shopUrl: string;
+  active: boolean;
+  createdAt: string;
+};
 
 export default function QrPaymentPage() {
+  const { shopUrl } = useParams();
+
+  const { getShopInfo } = useGetShopInfo();
+
+  const [shop, setShop] = useState<TShop>();
+
+  useEffect(() => {
+    const fetchShop = async () => {
+      const fetchedShop = await getShopInfo(shopUrl);
+
+      console.log("fetched shop: ", fetchedShop);
+
+      setShop(fetchedShop);
+    };
+
+    fetchShop();
+  }, []);
+
+  const [cart, setCart] = useState<
+    {
+      id: number;
+      name: string;
+      price: number;
+      quantity: number;
+    }[]
+  >([]);
+
+  const [customerInfo, setCustomerInfo] = useState<{
+    customerName: string;
+    tableNo: number;
+  }>();
+
+  useEffect(() => {
+    try {
+      const cartKey = shopUrl ? shopUrl : "";
+      const customerKey = shopUrl ? shopUrl + "customerInfo" : "";
+      const localCart = localStorage.getItem(cartKey);
+
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+
+      const localCustomerInfo = localStorage.getItem(customerKey);
+
+      if (localCustomerInfo) {
+        setCustomerInfo(JSON.parse(localCustomerInfo));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const [QRImageData, setQRImageData] = useState("");
+
+  useEffect(() => {
+    const generateQR = async () => {
+      const values = {
+        accountNo: shop?.accountNo,
+        accountName: shop?.accountName,
+        acqId: shop?.acqId,
+        addInfo: `Thanh toán hóa đơn từ ${shop?.name}`,
+        amount: `${cart.reduce(
+          (accumulator, currentValue) =>
+            accumulator + currentValue.price * currentValue.quantity,
+          0,
+        )}`,
+        template: "print",
+      };
+
+      console.log("values: ", values);
+
+      // const resQR = await axios.post(
+      //   `https://api.vietqr.io/v2/generate`,
+      //   values,
+      // );
+
+      const res = await fetch("https://api.vietqr.io/v2/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-client-id": "e72fa13f-ca76-4957-b7c1-e080f368dcd8",
+          "x-api-key": "0bffd4a8-daed-4f3c-8eb5-f70088f70aca",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const resQR = await res.json();
+
+      console.log("resQR: ", resQR);
+
+      const qrDataURL = resQR.data;
+
+      console.log("QR data: ", qrDataURL);
+
+      setQRImageData(qrDataURL["qrDataURL"]);
+    };
+
+    if (shop) {
+      generateQR();
+    }
+  }, [shop]);
+
+  const { loading, placeOrder } = usePlaceOrder();
+
+  const navigate = useNavigate();
+
+  const sendOrder = async () => {
+    const res = await placeOrder(
+      customerInfo?.customerName,
+      customerInfo?.tableNo,
+      shopUrl,
+      cart,
+    );
+
+    console.log(res);
+
+    const key = shopUrl ? shopUrl : "";
+
+    localStorage.removeItem(key);
+
+    localStorage.setItem(key + "orderId", res.orderId);
+
+    navigate("../after-payment");
+  };
+
   return (
     <>
       <header className="fixed top-0 w-full z-30 bg-white transition-all shadow-md pt-0">
@@ -17,7 +158,7 @@ export default function QrPaymentPage() {
                 src="/hero.png"
               />
               <div className="flex items-center">
-                <h1 className="font-semibold text-xl">DeeDeeShop</h1>
+                <h1 className="font-semibold md:text-xl">{shop?.name}</h1>
               </div>
             </div>
           </div>
@@ -46,7 +187,13 @@ export default function QrPaymentPage() {
               <FlowbiteButton outline gradientMonochrome="failure">
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 <span className="hidden sm:inline mr-2">Giỏ hàng</span>
-                <Badge>6</Badge>
+                <Badge>
+                  {cart.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.quantity,
+                    0,
+                  )}
+                </Badge>
               </FlowbiteButton>
             </Link>
           </div>
@@ -83,24 +230,51 @@ export default function QrPaymentPage() {
       {/* End Mobile Navigation */}
 
       {/* Main content */}
-      <main className="mt-24 mb-20 md:mb-5">
+      <main className="mt-20 mb-20 md:mb-5">
         <div className="m-auto w-96 rounded-lg border-gray-500 bg-white/90 p-5 shadow-inner">
-          <h1 className="text-center text-3xl font-bold dark:text-white my-3 mb-6">
+          <h1 className="text-center text-lg sm:text-3xl font-bold dark:text-white sm:my-3">
             Quét mã dưới đây để thực hiện thanh toán
           </h1>
 
-          <img src="/placeholder.svg" alt="qrcode" className="w-full" />
+          {QRImageData ? (
+            <div className="flex flex-col items-center">
+              <img src={QRImageData} alt="qrcode" className="w-full" />
+              <a href={QRImageData} download>
+                <FlowbiteButton
+                  className="flex items-center"
+                  disabled={loading}
+                >
+                  <span>
+                    <Download className="h-5 w-5 mr-2" />
+                  </span>
+                  <span>Tải ảnh xuống</span>
+                </FlowbiteButton>
+              </a>
+            </div>
+          ) : (
+            <div className="w-full text-center">
+              <Spinner size="xl" />
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 mt-3">
-            <Link to="../after-payment">
-              <Button className="w-full">Xác nhận thanh toán thành công</Button>
-            </Link>
-
-            <Link to="../confirm-payment">
-              <Button className="w-full" variant="secondary">
-                Quay lại
+            {loading ? (
+              <Button className="w-full" onClick={sendOrder} disabled>
+                <Spinner />
               </Button>
-            </Link>
+            ) : (
+              <>
+                <Button className="w-full" onClick={sendOrder}>
+                  Xác nhận thanh toán thành công
+                </Button>
+
+                <Link to="../confirm-payment">
+                  <Button className="w-full" variant="secondary">
+                    Quay lại
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </main>

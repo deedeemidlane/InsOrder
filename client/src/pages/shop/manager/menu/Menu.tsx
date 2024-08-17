@@ -37,7 +37,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AddDishModal from "../modals/AddDishModal";
 import { useAuthContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import useLogout from "@/hooks/useLogout";
+import useLogout from "@/hooks/authentication/useLogout";
 import useGetMenu from "@/hooks/manager/useGetMenu";
 import { formatDate, formatPriceInVND } from "@/utils/helperFunctions";
 import { Spinner } from "flowbite-react";

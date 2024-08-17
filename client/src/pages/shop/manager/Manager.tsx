@@ -39,10 +39,10 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 import ChangePasswordModal from "./modals/ChangePasswordModal";
 import { useAuthContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import useLogout from "@/hooks/useLogout";
+import useLogout from "@/hooks/authentication/useLogout";
 import useGetShopInfo from "@/hooks/manager/useGetShopInfo";
 
-type ShopType = {
+type TShop = {
   name: string;
   username: string;
   shop: {
@@ -72,7 +72,7 @@ export default function ManagerPage() {
 
   const { getShopInfo } = useGetShopInfo();
 
-  const [shopInfo, setShopInfo] = useState<ShopType>();
+  const [shopInfo, setShopInfo] = useState<TShop>();
 
   useEffect(() => {
     const fetchShop = async () => {

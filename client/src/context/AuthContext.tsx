@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-type AuthUserType = {
+type TAuthUser = {
   id: string;
   username: string;
   name: string;
@@ -17,8 +17,8 @@ type AuthUserType = {
 };
 
 const AuthContext = createContext<{
-  authUser: AuthUserType | null;
-  setAuthUser: Dispatch<SetStateAction<AuthUserType | null>>;
+  authUser: TAuthUser | null;
+  setAuthUser: Dispatch<SetStateAction<TAuthUser | null>>;
   isLoading: boolean;
 }>({
   authUser: null,
@@ -27,7 +27,7 @@ const AuthContext = createContext<{
 });
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
-  const [authUser, setAuthUser] = useState<AuthUserType | null>(null);
+  const [authUser, setAuthUser] = useState<TAuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {

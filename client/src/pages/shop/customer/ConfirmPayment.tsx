@@ -1,11 +1,69 @@
 import { Label, TextInput } from "flowbite-react";
 import { ShoppingCart, Utensils, Search, Info } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button as FlowbiteButton } from "flowbite-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import useGetMenu from "@/hooks/customer/useGetMenu";
+import { useEffect, useState } from "react";
 
 export default function ConfirmPaymentPage() {
+  const { shopUrl } = useParams();
+
+  const { getMenu } = useGetMenu();
+
+  const [shopName, setShopName] = useState("");
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const fetchedMenu = await getMenu(shopUrl);
+      console.log(fetchedMenu);
+
+      setShopName(fetchedMenu.shopName);
+    };
+
+    fetchMenu();
+  }, []);
+
+  const [cart, setCart] = useState<
+    {
+      id: number;
+      name: string | undefined;
+      price: number | undefined;
+      quantity: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    try {
+      const key = shopUrl ? shopUrl : "";
+      const localCart = localStorage.getItem(key);
+
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const [inputs, setInputs] = useState({
+    customerName: "",
+    tableNo: 0,
+  });
+
+  const navigate = useNavigate();
+
+  const handleSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const key = shopUrl ? shopUrl + "customerInfo" : "";
+
+    localStorage.setItem(key, JSON.stringify(inputs));
+
+    navigate("../qr-pay");
+  };
+
   return (
     <>
       <header className="fixed top-0 w-full z-30 bg-white transition-all shadow-md pt-0">
@@ -18,7 +76,7 @@ export default function ConfirmPaymentPage() {
                 src="/hero.png"
               />
               <div className="flex items-center">
-                <h1 className="font-semibold text-xl">DeeDeeShop</h1>
+                <h1 className="font-semibold text-xl">{shopName}</h1>
               </div>
             </div>
           </div>
@@ -47,7 +105,13 @@ export default function ConfirmPaymentPage() {
               <FlowbiteButton outline gradientMonochrome="failure">
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 <span className="hidden sm:inline mr-2">Giỏ hàng</span>
-                <Badge>6</Badge>
+                <Badge>
+                  {cart.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.quantity,
+                    0,
+                  )}
+                </Badge>
               </FlowbiteButton>
             </Link>
           </div>
@@ -84,15 +148,16 @@ export default function ConfirmPaymentPage() {
       {/* End Mobile Navigation */}
 
       {/* Main content */}
-      <main
-        className={`flex h-screen align-middle sm:bg-[url('/login-background.jpg')]`}
-      >
+      <main className={`flex h-screen align-middle`}>
         <div className="m-auto w-96 rounded-lg border-gray-500 bg-white/90 p-5 shadow-lg dark:bg-zinc-800 dark:sm:border-4">
           <h1 className="text-center whitespace-nowrap text-3xl font-bold dark:text-white my-3 mb-6">
             Xác nhận thanh toán
           </h1>
 
-          <form className="flex max-w-md flex-col gap-4" method="post">
+          <form
+            className="flex max-w-md flex-col gap-4"
+            onSubmit={handleSubmitForm}
+          >
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="name" value="Họ và tên" />
@@ -102,25 +167,32 @@ export default function ConfirmPaymentPage() {
                 type="text"
                 required
                 placeholder="Nhập tên của bạn"
+                value={inputs.customerName}
+                onChange={(e) =>
+                  setInputs({ ...inputs, customerName: e.target.value })
+                }
               />
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="password" value="Số bàn" />
+                <Label htmlFor="tableNo" value="Số bàn" />
               </div>
               <TextInput
-                id="password"
-                type="text"
+                id="tableNo"
+                type="number"
                 required
-                shadow
                 placeholder="Nhập số bàn"
+                value={inputs.tableNo}
+                onChange={(e) =>
+                  setInputs({ ...inputs, tableNo: parseInt(e.target.value) })
+                }
               />
             </div>
 
             <div className="flex flex-col gap-3">
-              <Link to="../qr-pay">
-                <Button className="w-full">Xác nhận</Button>
-              </Link>
+              <Button className="w-full" type="submit">
+                Xác nhận
+              </Button>
 
               <Link to="../cart">
                 <Button className="w-full" variant="secondary">

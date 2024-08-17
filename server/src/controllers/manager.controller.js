@@ -30,7 +30,7 @@ export const getShopInfo = async (req, res) => {
       res.status(404).json({ error: "Không tìm thấy tài nguyên" });
     }
   } catch (error) {
-    console.log("Error in createShop controller: ", error.message);
+    console.log("Error in getShopInfo controller: ", error.message);
     res.status(500).json({ error: "Lỗi hệ thống" });
   }
 };
@@ -63,7 +63,7 @@ export const createDish = async (req, res) => {
       res.status(400).json({ error: "Dữ liệu không hợp lệ" });
     }
   } catch (error) {
-    console.log("Error in createShop controller: ", error.message);
+    console.log("Error in createDish controller: ", error.message);
     res.status(500).json({ error: "Lỗi hệ thống" });
   }
 };
@@ -92,7 +92,7 @@ export const getMenu = async (req, res) => {
       res.status(404).json({ error: "Không tìm thấy tài nguyên" });
     }
   } catch (error) {
-    console.log("Error in createShop controller: ", error.message);
+    console.log("Error in getMenu controller: ", error.message);
     res.status(500).json({ error: "Lỗi hệ thống" });
   }
 };
@@ -156,7 +156,7 @@ export const getStaffs = async (req, res) => {
       res.status(404).json({ error: "Không tìm thấy tài nguyên" });
     }
   } catch (error) {
-    console.log("Error in createShop controller: ", error.message);
+    console.log("Error in getStaffs controller: ", error.message);
     res.status(500).json({ error: "Lỗi hệ thống" });
   }
 };

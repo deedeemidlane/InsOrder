@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Checkbox, Label, Spinner, TextInput } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
-import useLogin from "@/hooks/useLogin";
+import useLogin from "@/hooks/authentication/useLogin";
 import { useAuthContext } from "@/context/AuthContext";
 
 export default function LoginPage() {

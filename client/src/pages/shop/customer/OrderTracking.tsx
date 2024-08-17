@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import { Button } from "flowbite-react";
+import { Button as ShadButton } from "@/components/ui/button";
 import {
   AlarmClock,
   ChefHat,
@@ -26,20 +28,11 @@ import {
 } from "@/utils/helperFunctions";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import useGetMenu from "@/hooks/customer/useGetMenu";
 
-const templateOrder = {
-  id: "1",
-  createdAt: "2024-08-12T15:47:09.130Z",
-  products: [
-    { name: "Americano", quantity: 1, price: 50000 },
-    { name: "Espresso", quantity: 2, price: 40000 },
-  ],
-  customerName: "Nguyễn Việt Anh",
-  tableNo: 10,
-  status: "COMPLETED",
-};
+import useGetOrder from "@/hooks/customer/useGetOrder";
 
-function generateOrderStatusButton(orderStatus: string) {
+function generateOrderStatusButton(orderStatus: string | undefined) {
   switch (orderStatus) {
     case "PROCESSING":
       return (
@@ -83,9 +76,89 @@ function generateOrderStatusButton(orderStatus: string) {
   }
 }
 
+type TOrder = {
+  id: number;
+  customerName: string;
+  tableNo: number;
+  status: string;
+  shopId: number;
+  createdAt: string;
+  updatedAt: string;
+  orderItems: {
+    id: number;
+    orderId: number;
+    productId: number;
+    quantity: number;
+    createdAt: string;
+    updatedAt: string;
+  }[];
+};
+
+type TProduct = {
+  id: number;
+  image: string;
+  name: string;
+  price: number;
+  status: boolean;
+  createdAt: string;
+};
+
 export default function OrderTrackingPage() {
-  const { shopName } = useParams();
-  console.log(shopName);
+  const { shopUrl } = useParams();
+
+  const { getMenu } = useGetMenu();
+
+  const [shopName, setShopName] = useState("");
+  const [menu, setMenu] = useState<TProduct[]>([]);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const fetchedMenu = await getMenu(shopUrl);
+      console.log(fetchedMenu);
+
+      setShopName(fetchedMenu.shopName);
+      setMenu(fetchedMenu.products);
+    };
+
+    fetchMenu();
+  }, []);
+
+  const [cart, setCart] = useState<
+    {
+      id: number;
+      name: string | undefined;
+      price: number | undefined;
+      quantity: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    try {
+      const key = shopUrl ? shopUrl : "";
+      const localCart = localStorage.getItem(key);
+
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const [order, setOrder] = useState<TOrder>();
+
+  const { getOrder } = useGetOrder();
+
+  const [orderId, setOrderId] = useState<number | null>(null);
+
+  const handleSubmitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const res = await getOrder(orderId || 0);
+
+    setOrder(res);
+  };
+
   return (
     <>
       <header className="fixed top-0 w-full z-30 bg-white transition-all shadow-md pt-0">
@@ -98,7 +171,7 @@ export default function OrderTrackingPage() {
                 src="/hero.png"
               />
               <div className="flex items-center">
-                <h1 className="font-semibold text-xl">DeeDeeShop</h1>
+                <h1 className="font-semibold md:text-xl">{shopName}</h1>
               </div>
             </div>
           </div>
@@ -127,7 +200,13 @@ export default function OrderTrackingPage() {
               <Button outline gradientMonochrome="failure">
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 <span className="hidden sm:inline mr-2">Giỏ hàng</span>
-                <Badge>6</Badge>
+                <Badge>
+                  {cart.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.quantity,
+                    0,
+                  )}
+                </Badge>
               </Button>
             </Link>
           </div>
@@ -173,91 +252,100 @@ export default function OrderTrackingPage() {
             </h1>
 
             <div className="w-full">
-              <form className="relative">
+              <form onSubmit={handleSubmitForm} className="relative">
                 <input
-                  type="text"
+                  type="number"
                   placeholder="Nhập mã đơn hàng"
-                  name="id"
                   required
                   className="z-0 h-14 w-full rounded-lg border-2 pl-5 pr-20 focus:shadow focus:outline-none"
+                  value={orderId || ""}
+                  onChange={(e) => setOrderId(parseInt(e.target.value))}
                 />
-                <Button
-                  // type="submit"
-                  className="absolute right-2 top-2 bg-red-500"
-                >
+                <ShadButton type="submit" className="absolute right-2 top-2">
                   Tìm kiếm
-                </Button>
+                </ShadButton>
               </form>
             </div>
           </div>
-          <Card className="overflow-hidden mt-3">
-            <CardHeader className="flex flex-row items-start bg-muted/60">
-              <div className="grid gap-0.5">
-                <CardTitle className="group flex items-center gap-2 text-lg">
-                  Đơn số <span className="font-thin">#{templateOrder.id}</span>
-                </CardTitle>
-                <CardDescription className="flex items-center text-black gap-1">
-                  <AlarmClock className="h-5" />
-                  {formatTime(templateOrder.createdAt)}{" "}
-                  {formatDate(templateOrder.createdAt)}
-                </CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6 text-sm">
-              <div className="grid gap-3">
-                <div className="font-semibold">Chi tiết đơn hàng</div>
-                <ul className="grid gap-3">
-                  {templateOrder.products.map((product, index) => (
-                    <li
-                      className="flex items-center justify-between"
-                      key={index}
-                    >
-                      <span className="text-muted-foreground">
-                        {product.name} x <span>{product.quantity}</span>
-                      </span>
-                      <span>{formatPriceInVND(product.price)}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Separator className="my-2" />
-                <ul className="grid gap-3">
-                  <li className="flex items-center justify-between font-semibold">
-                    <span className="text-muted-foreground">Tổng</span>
-                    <span>
-                      {formatPriceInVND(
-                        templateOrder.products.reduce(
-                          (accumulator, currentValue) =>
-                            accumulator +
-                            currentValue.price * currentValue.quantity,
-                          0,
-                        ),
-                      )}
-                    </span>
-                  </li>
-                </ul>
-              </div>
 
-              <Separator className="my-4" />
-              <div className="grid gap-3">
-                <div className="font-semibold">Thông tin thêm</div>
-                <dl className="grid gap-3">
-                  <div className="flex items-center justify-between">
-                    <dt className="text-muted-foreground">Khách hàng</dt>
-                    <dd>{templateOrder.customerName}</dd>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <dt className="text-muted-foreground">Bàn số</dt>
-                    <dd>{templateOrder.tableNo}</dd>
-                  </div>
-                </dl>
-              </div>
-              <Separator className="my-4" />
-              <div className="flex items-center gap-4">
-                {generateOrderStatusButton(templateOrder.status)}
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-row items-center border-t  bg-muted/60 px-6 py-3"></CardFooter>
-          </Card>
+          {order && (
+            <Card className="overflow-hidden mt-3">
+              <CardHeader className="flex flex-row items-start bg-muted/60">
+                <div className="grid gap-0.5">
+                  <CardTitle className="group flex items-center gap-2 text-lg">
+                    Đơn số <span className="font-thin">#{order?.id}</span>
+                  </CardTitle>
+                  <CardDescription className="flex items-center text-black gap-1">
+                    <AlarmClock className="h-5" />
+                    {formatTime(order?.createdAt || "")}{" "}
+                    {formatDate(order?.createdAt || "")}
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 text-sm">
+                <div className="grid gap-3">
+                  <div className="font-semibold">Chi tiết đơn hàng</div>
+                  <ul className="grid gap-3">
+                    {order?.orderItems.map((product, index) => (
+                      <li
+                        className="flex items-center justify-between"
+                        key={index}
+                      >
+                        <span className="text-muted-foreground">
+                          {menu.find((e) => e.id === product.productId)?.name} x{" "}
+                          <span>{product.quantity}</span>
+                        </span>
+                        <span>
+                          {formatPriceInVND(
+                            menu.find((e) => e.id === product.productId)
+                              ?.price || 0,
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Separator className="my-2" />
+                  <ul className="grid gap-3">
+                    <li className="flex items-center justify-between font-semibold">
+                      <span className="text-muted-foreground">Tổng</span>
+                      <span>
+                        {formatPriceInVND(
+                          order?.orderItems.reduce(
+                            (accumulator, currentValue) =>
+                              accumulator +
+                              (menu.find((e) => e.id === currentValue.productId)
+                                ?.price || 0) *
+                                currentValue.quantity,
+                            0,
+                          ) || 0,
+                        )}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <Separator className="my-4" />
+                <div className="grid gap-3">
+                  <div className="font-semibold">Thông tin thêm</div>
+                  <dl className="grid gap-3">
+                    <div className="flex items-center justify-between">
+                      <dt className="text-muted-foreground">Khách hàng</dt>
+                      <dd>{order?.customerName}</dd>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <dt className="text-muted-foreground">Bàn số</dt>
+                      <dd>{order?.tableNo}</dd>
+                    </div>
+                  </dl>
+                </div>
+                <Separator className="my-4" />
+                <div className="flex items-center gap-4">
+                  {generateOrderStatusButton(order?.status)}
+                </div>
+              </CardContent>
+              <CardFooter className="flex flex-row items-center border-t  bg-muted/60 px-6 py-3"></CardFooter>
+            </Card>
+          )}
         </div>
       </div>
     </>

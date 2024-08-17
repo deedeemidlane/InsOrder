@@ -27,16 +27,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AddShopModal from "./modals/AddShopModal";
-import useLogout from "@/hooks/useLogout";
+import useLogout from "@/hooks/authentication/useLogout";
 import { useAuthContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import useCreateShop from "@/hooks/useCreateShop";
-import useGetShops from "@/hooks/useGetShops";
+import useCreateShop from "@/hooks/admin/useCreateShop";
+import useGetShops from "@/hooks/admin/useGetShops";
 import { Spinner } from "flowbite-react";
 import { formatDate } from "@/utils/helperFunctions";
 
-type ShopType = {
+type TShop = {
   name: string;
   shop: {
     id: number;
@@ -68,7 +68,7 @@ export default function AdminPage() {
 
   const [openAddShopModal, setOpenAddShopModal] = useState(false);
 
-  const [shops, setShops] = useState<ShopType[]>([]);
+  const [shops, setShops] = useState<TShop[]>([]);
 
   const handleSubmitForm = async (e: React.FormEvent, inputs: {}) => {
     e.preventDefault();

@@ -1,10 +1,58 @@
 import { ShoppingCart, Utensils, Search, Info } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button as FlowbiteButton } from "flowbite-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import useGetMenu from "@/hooks/customer/useGetMenu";
+import { useState, useEffect } from "react";
 
 export default function AfterPaymentPage() {
+  const { shopUrl } = useParams();
+
+  const { getMenu } = useGetMenu();
+
+  const [shopName, setShopName] = useState("");
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const fetchedMenu = await getMenu(shopUrl);
+      console.log(fetchedMenu);
+
+      setShopName(fetchedMenu.shopName);
+    };
+
+    fetchMenu();
+  }, []);
+
+  const [cart, setCart] = useState<
+    {
+      id: number;
+      name: string | undefined;
+      price: number | undefined;
+      quantity: number;
+    }[]
+  >([]);
+
+  const [orderId, setOrderId] = useState();
+
+  useEffect(() => {
+    try {
+      const key = shopUrl ? shopUrl : "";
+      const localCart = localStorage.getItem(key);
+      const localOrderId = localStorage.getItem(key + "orderId");
+
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+
+      if (localOrderId) {
+        setOrderId(JSON.parse(localOrderId));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   return (
     <>
       <header className="fixed top-0 w-full z-30 bg-white transition-all shadow-md pt-0">
@@ -17,7 +65,7 @@ export default function AfterPaymentPage() {
                 src="/hero.png"
               />
               <div className="flex items-center">
-                <h1 className="font-semibold text-xl">DeeDeeShop</h1>
+                <h1 className="font-semibold md:text-xl">{shopName}</h1>
               </div>
             </div>
           </div>
@@ -46,7 +94,13 @@ export default function AfterPaymentPage() {
               <FlowbiteButton outline gradientMonochrome="failure">
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 <span className="hidden sm:inline mr-2">Giỏ hàng</span>
-                <Badge>6</Badge>
+                <Badge>
+                  {cart.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.quantity,
+                    0,
+                  )}
+                </Badge>
               </FlowbiteButton>
             </Link>
           </div>
@@ -91,7 +145,9 @@ export default function AfterPaymentPage() {
 
           <p className="text-center">Mã đơn hàng của bạn là:</p>
 
-          <h2 className="text-center text-3xl font-bold my-3 mb-6">123</h2>
+          <h2 className="text-center text-3xl font-bold my-3 mb-6">
+            {orderId}
+          </h2>
 
           <p className="text-center">
             Bạn có thể điền mã này vào trang{" "}

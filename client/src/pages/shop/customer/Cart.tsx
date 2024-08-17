@@ -1,16 +1,108 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import useGetMenu from "@/hooks/customer/useGetMenu";
 import { formatPriceInVND } from "@/utils/helperFunctions";
-import { Button as FlowbiteButton } from "flowbite-react";
-import { ShoppingCart, Utensils, Search, Info, X } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const templateCart = [
-  { name: "Americano", quantity: 1, price: 50000 },
-  { name: "Espresso", quantity: 2, price: 40000 },
-];
+import { Button as FlowbiteButton, Spinner } from "flowbite-react";
+import {
+  ShoppingCart,
+  Utensils,
+  Search,
+  Info,
+  X,
+  Plus,
+  Minus,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 
 export default function CartPage() {
+  const { shopUrl } = useParams();
+
+  const { loading, getMenu } = useGetMenu();
+
+  const [shopName, setShopName] = useState("");
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const fetchedMenu = await getMenu(shopUrl);
+      console.log(fetchedMenu);
+
+      setShopName(fetchedMenu.shopName);
+    };
+
+    fetchMenu();
+  }, []);
+
+  const [cart, setCart] = useState<
+    {
+      id: number;
+      name: string;
+      price: number;
+      quantity: number;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    try {
+      const key = shopUrl ? shopUrl : "";
+      const localCart = localStorage.getItem(key);
+
+      if (localCart) {
+        setCart(JSON.parse(localCart));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const minusQuantity = (id: number) => {
+    let temp = [...cart];
+
+    const index = temp.findIndex((e) => e.id === id);
+
+    if (index !== -1) {
+      if (temp[index].quantity === 1) {
+        temp.splice(index, 1);
+      } else {
+        temp[index] = { ...temp[index], quantity: temp[index].quantity - 1 };
+      }
+    }
+
+    const key = shopUrl ? shopUrl : "";
+    localStorage.setItem(key, JSON.stringify(temp));
+
+    setCart(temp);
+  };
+
+  const addQuantity = (id: number) => {
+    let temp = [...cart];
+
+    const index = temp.findIndex((e) => e.id === id);
+
+    if (index !== -1) {
+      temp[index] = { ...temp[index], quantity: temp[index].quantity + 1 };
+    }
+
+    const key = shopUrl ? shopUrl : "";
+    localStorage.setItem(key, JSON.stringify(temp));
+
+    setCart(temp);
+  };
+
+  const removeProduct = (id: number) => {
+    let temp = [...cart];
+
+    const index = temp.findIndex((e) => e.id === id);
+
+    if (index !== -1) {
+      temp.splice(index, 1);
+    }
+
+    const key = shopUrl ? shopUrl : "";
+    localStorage.setItem(key, JSON.stringify(temp));
+
+    setCart(temp);
+  };
   return (
     <>
       <header className="fixed top-0 w-full z-30 bg-white transition-all shadow-md pt-0">
@@ -23,7 +115,7 @@ export default function CartPage() {
                 src="/hero.png"
               />
               <div className="flex items-center">
-                <h1 className="font-semibold text-xl">DeeDeeShop</h1>
+                <h1 className="font-semibold md:text-xl">{shopName}</h1>
               </div>
             </div>
           </div>
@@ -52,7 +144,13 @@ export default function CartPage() {
               <FlowbiteButton outline gradientMonochrome="failure">
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 <span className="hidden sm:inline mr-2">Giỏ hàng</span>
-                <Badge>6</Badge>
+                <Badge>
+                  {cart.reduce(
+                    (accumulator, currentValue) =>
+                      accumulator + currentValue.quantity,
+                    0,
+                  )}
+                </Badge>
               </FlowbiteButton>
             </Link>
           </div>
@@ -95,199 +193,49 @@ export default function CartPage() {
             Giỏ hàng
           </h2>
 
-          <div className="mt-2 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
-            <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
-              <div className="space-y-6">
-                {templateCart.map((product) => (
-                  <>
-                    <div className="hidden md:block rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
-                      <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-                        <a href="#" className="shrink-0 md:order-1">
-                          <img
-                            src="/placeholder.svg"
-                            alt="product image"
-                            className="h-20 w-20 rounded-md border-2"
-                          />
-                        </a>
-
-                        <div className="flex items-center justify-between md:order-3 md:justify-end">
-                          <div className="flex items-center">
-                            {/* Decrease button */}
-                            <button
-                              type="button"
-                              id="decrement-button"
-                              data-input-counter-decrement="counter-input"
-                              className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                            >
-                              <svg
-                                className="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 18 2"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M1 1h16"
-                                />
-                              </svg>
-                            </button>
-                            <input
-                              type="text"
-                              id="counter-input"
-                              data-input-counter
-                              className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white"
-                              placeholder=""
-                              defaultValue={product.quantity}
-                              required
-                            />
-                            {/* Increase button */}
-                            <button
-                              type="button"
-                              id="increment-button"
-                              data-input-counter-increment="counter-input"
-                              className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                            >
-                              <svg
-                                className="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 18 18"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M9 1v16M1 9h16"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                          <div className="text-end md:order-4 md:w-32">
-                            <p className="text-base font-bold text-gray-900 dark:text-white">
-                              {formatPriceInVND(
-                                product.price * product.quantity,
-                              )}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
-                          <a
-                            href="#"
-                            className="text-xl font-medium text-gray-900 hover:underline dark:text-white"
-                          >
-                            {product.name}
-                          </a>
-
-                          <div className="flex items-center gap-4">
-                            <button
-                              type="button"
-                              className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
-                            >
-                              <svg
-                                className="me-1.5 h-5 w-5"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M6 18 17.94 6M18 18 6.06 6"
-                                />
-                              </svg>
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="md:hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <a href="#" className="shrink-0 md:order-1">
+          {loading ? (
+            <main className="flex items-center justify-center mt-10">
+              <Spinner size="xl" color="failure" />
+            </main>
+          ) : (
+            <div className="mt-2 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+              <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
+                <div className="space-y-6">
+                  {cart.map((product, index) => (
+                    <div key={index}>
+                      <div className="hidden md:block rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
+                        <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
+                          <div className="shrink-0 md:order-1">
                             <img
                               src="/placeholder.svg"
                               alt="product image"
                               className="h-20 w-20 rounded-md border-2"
                             />
-                          </a>
-                          <div>
-                            <a
-                              href="#"
-                              className="text-xl font-medium text-gray-900 hover:underline dark:text-white"
-                            >
-                              {product.name}
-                            </a>
+                          </div>
+
+                          <div className="flex items-center justify-between md:order-3 md:justify-end">
                             <div className="flex items-center">
                               {/* Decrease button */}
                               <button
                                 type="button"
-                                id="decrement-button"
-                                data-input-counter-decrement="counter-input"
-                                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                onClick={() => minusQuantity(product.id)}
                               >
-                                <svg
-                                  className="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                                  aria-hidden="true"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 18 2"
-                                >
-                                  <path
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M1 1h16"
-                                  />
-                                </svg>
+                                <Minus className="h-3" />
                               </button>
-                              <input
-                                type="text"
-                                id="counter-input"
-                                data-input-counter
-                                className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white"
-                                placeholder=""
-                                defaultValue={product.quantity}
-                                required
-                              />
+                              <div className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white">
+                                {product.quantity}
+                              </div>
                               {/* Increase button */}
                               <button
                                 type="button"
-                                id="increment-button"
-                                data-input-counter-increment="counter-input"
-                                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                onClick={() => addQuantity(product.id)}
                               >
-                                <svg
-                                  className="h-2.5 w-2.5 text-gray-900 dark:text-white"
-                                  aria-hidden="true"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 18 18"
-                                >
-                                  <path
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 1v16M1 9h16"
-                                  />
-                                </svg>
+                                <Plus className="h-3" />
                               </button>
                             </div>
-                            <div className="md:order-4 md:w-32">
+                            <div className="text-end md:order-4 md:w-32">
                               <p className="text-base font-bold text-gray-900 dark:text-white">
                                 {formatPriceInVND(
                                   product.price * product.quantity,
@@ -295,94 +243,127 @@ export default function CartPage() {
                               </p>
                             </div>
                           </div>
+
+                          <div className="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
+                            <div className="text-xl font-medium text-gray-900">
+                              {product.name}
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              <button
+                                type="button"
+                                className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
+                                onClick={() => removeProduct(product.id)}
+                              >
+                                <X className="me-1.5 h-5 w-5" />
+                                Xóa
+                              </button>
+                            </div>
+                          </div>
                         </div>
-
-                        <Button variant="outline" size="sm">
-                          <X className="h-5 text-red-600" />
-                        </Button>
                       </div>
+
+                      {/* Mobile cart */}
+                      <div className="md:hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="shrink-0 md:order-1">
+                              <img
+                                src="/placeholder.svg"
+                                alt="product image"
+                                className="h-20 w-20 rounded-md border-2"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <div className="text-md font-medium text-gray-900">
+                                {product.name}
+                              </div>
+                              <div className="flex items-center">
+                                {/* Decrease button */}
+                                <button
+                                  type="button"
+                                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                  onClick={() => minusQuantity(product.id)}
+                                >
+                                  <Minus className="h-3" />
+                                </button>
+                                <div className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white">
+                                  {product.quantity}
+                                </div>
+                                {/* Increase button */}
+                                <button
+                                  type="button"
+                                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                  onClick={() => addQuantity(product.id)}
+                                >
+                                  <Plus className="h-3" />
+                                </button>
+                              </div>
+                              <div className="md:order-4 md:w-32">
+                                <p className="text-base font-bold text-gray-900 dark:text-white">
+                                  {formatPriceInVND(
+                                    product.price * product.quantity,
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeProduct(product.id)}
+                          >
+                            <X className="h-5 text-red-600" />
+                          </Button>
+                        </div>
+                      </div>
+                      {/* End mobile cart */}
                     </div>
-                  </>
-                ))}
-              </div>
-            </div>
-
-            <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
-              <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-                <p className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Tổng kết hóa đơn
-                </p>
-
-                <div className="space-y-4">
-                  {/* <div className="space-y-2">
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Original price
-                      </dt>
-                      <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        $7,592.00
-                      </dd>
-                    </dl>
-
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Savings
-                      </dt>
-                      <dd className="text-base font-medium text-green-600">
-                        -$299.00
-                      </dd>
-                    </dl>
-
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Store Pickup
-                      </dt>
-                      <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        $99
-                      </dd>
-                    </dl>
-
-                    <dl className="flex items-center justify-between gap-4">
-                      <dt className="text-base font-normal text-gray-500 dark:text-gray-400">
-                        Tax
-                      </dt>
-                      <dd className="text-base font-medium text-gray-900 dark:text-white">
-                        $799
-                      </dd>
-                    </dl>
-                  </div> */}
-
-                  <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
-                    <dt className="text-base font-bold text-gray-900 dark:text-white">
-                      Tổng
-                    </dt>
-                    <dd className="text-base font-bold text-gray-900 dark:text-white">
-                      {formatPriceInVND(
-                        templateCart.reduce(
-                          (accumulator, currentValue) =>
-                            accumulator +
-                            currentValue.price * currentValue.quantity,
-                          0,
-                        ),
-                      )}
-                    </dd>
-                  </dl>
+                  ))}
                 </div>
+              </div>
 
-                <div className="flex flex-col gap-3">
-                  <Link to="../confirm-payment">
-                    <Button className="w-full">Thanh toán</Button>
-                  </Link>
+              {/* Order summary */}
+              <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
+                <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+                  <p className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Tổng kết hóa đơn
+                  </p>
 
-                  <Link to="../">
-                    <Button className="w-full" variant="secondary">
-                      Quay lại
-                    </Button>
-                  </Link>
+                  <div className="space-y-4">
+                    <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
+                      <dt className="text-base font-bold text-gray-900 dark:text-white">
+                        Tổng
+                      </dt>
+                      <dd className="text-base font-bold text-gray-900 dark:text-white">
+                        {formatPriceInVND(
+                          cart.reduce(
+                            (accumulator, currentValue) =>
+                              accumulator +
+                              currentValue.price * currentValue.quantity,
+                            0,
+                          ),
+                        )}
+                      </dd>
+                    </dl>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <Link to="../confirm-payment">
+                      <Button className="w-full">Thanh toán</Button>
+                    </Link>
+
+                    <Link to="../">
+                      <Button className="w-full" variant="secondary">
+                        Quay lại
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </>

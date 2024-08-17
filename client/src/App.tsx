@@ -54,7 +54,7 @@ function App() {
         />
       </Route>
       <Route path="/shop/staff" element={<StaffPage />} />
-      <Route path="/shop/public/:shopName">
+      <Route path="/shop/public/:shopUrl">
         <Route index element={<MenuPage />} />
         <Route path="order-tracking" element={<OrderTrackingPage />} />
         <Route path="shop-info" element={<ShopInfoPage />} />

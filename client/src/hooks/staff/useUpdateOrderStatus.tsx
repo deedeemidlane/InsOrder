@@ -1,18 +1,16 @@
 import { useState } from "react";
-import { useAuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
-const useLogin = () => {
+const useUpdateOrderStatus = () => {
   const [loading, setLoading] = useState(false);
-  const { setAuthUser } = useAuthContext();
 
-  const login = async (username: string, password: string) => {
+  const updateOrderStatus = async (orderId: number) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/staff/update-order-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ orderId }),
       });
 
       const data = await res.json();
@@ -20,7 +18,9 @@ const useLogin = () => {
 
       if (!res.ok) throw new Error(data.error);
 
-      setAuthUser(data);
+      toast.success(data.message);
+
+      return data.nextStatus;
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -28,6 +28,6 @@ const useLogin = () => {
     }
   };
 
-  return { loading, login };
+  return { loading, updateOrderStatus };
 };
-export default useLogin;
+export default useUpdateOrderStatus;
