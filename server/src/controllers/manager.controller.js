@@ -37,26 +37,25 @@ export const getShopInfo = async (req, res) => {
 
 export const createDish = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "MANAGER") {
       return res
         .status(401)
         .json({ error: "Unauthorized - Not manager token" });
     }
 
-    const { name, image, price } = req.body;
+    const { name, price } = req.body;
+
+    const image = "/TempStorage/" + req.file.filename;
 
     const newDish = await prisma.product.create({
       data: {
         name,
-        price,
-        image: "",
+        price: parseInt(price),
+        image,
         status: true,
         shopId: req.payload.shopId,
       },
     });
-
     if (newDish) {
       res.status(201).json({ message: "Thêm món thành công!" });
     } else {
@@ -70,8 +69,6 @@ export const createDish = async (req, res) => {
 
 export const getMenu = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "MANAGER") {
       return res
         .status(401)
@@ -83,8 +80,6 @@ export const getMenu = async (req, res) => {
         shopId: req.payload.shopId,
       },
     });
-
-    console.log(products);
 
     if (products) {
       res.status(200).json(products);

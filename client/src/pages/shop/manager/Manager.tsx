@@ -48,8 +48,8 @@ type TShop = {
   shop: {
     id: number;
     name: string;
-    image: string;
     accountNo: string;
+    accountName: string;
     acqId: string;
     shopUrl: string;
     active: boolean;
@@ -205,7 +205,7 @@ export default function ManagerPage() {
                           alt="Shop image"
                           className="aspect-square w-full rounded-full border-2 object-cover"
                           height="84"
-                          src="/hero.png"
+                          src="/shop-image.jpg"
                           width="84"
                         />
                       </div>
@@ -227,16 +227,6 @@ export default function ManagerPage() {
                           defaultValue={shopInfo?.shop.name}
                         />
                       </div>
-                      {/* <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="image" className="text-right">
-                          Ảnh đại diện
-                        </Label>
-                        <Input
-                          id="image"
-                          className="col-span-3 p-0"
-                          type="file"
-                        />
-                      </div> */}
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="accountNo" className="text-right">
                           Số tài khoản
@@ -245,6 +235,16 @@ export default function ManagerPage() {
                           id="accountNo"
                           className="col-span-3"
                           defaultValue={shopInfo?.shop.accountNo}
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="accountNo" className="text-right">
+                          Tên tài khoản
+                        </Label>
+                        <Input
+                          id="accountNo"
+                          className="col-span-3"
+                          defaultValue={shopInfo?.shop.accountName}
                         />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">

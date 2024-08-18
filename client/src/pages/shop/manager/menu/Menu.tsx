@@ -72,14 +72,29 @@ export default function MenuManagementPage() {
 
   const [openAddDishModal, setOpenAddDishModal] = useState(false);
 
-  const handleSubmitForm = async (e: React.FormEvent, inputs: {}) => {
+  const [toggleReRender, setToggleReRender] = useState(false);
+
+  const handleSubmitForm = async (
+    e: React.FormEvent,
+    image: File,
+    name: string,
+    price: number,
+  ) => {
     e.preventDefault();
 
-    await createDish(inputs);
+    const formData = new FormData();
+
+    formData.append("image", image);
+    formData.append("name", name);
+    formData.append("price", price.toString());
+
+    console.log(formData);
+
+    await createDish(formData);
 
     setOpenAddDishModal(false);
 
-    // setMenu([]);
+    setToggleReRender(!toggleReRender);
   };
 
   useEffect(() => {
@@ -89,7 +104,7 @@ export default function MenuManagementPage() {
     };
 
     fetchMenu();
-  }, [createDishLoading]);
+  }, [toggleReRender]);
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       {/* Sidebar */}
@@ -243,18 +258,11 @@ export default function MenuManagementPage() {
                         {menu.map((product) => (
                           <TableRow key={product.id}>
                             <TableCell className="hidden sm:table-cell">
-                              {/* <img
-                            alt="Ảnh minh họa món"
-                            className="aspect-square rounded-md object-cover"
-                            height="64"
-                            src={product.image}
-                            width="64"
-                          /> */}
                               <img
                                 alt="Ảnh minh họa món"
                                 className="aspect-square rounded-md object-cover"
                                 height="64"
-                                src="/placeholder.svg"
+                                src={product.image}
                                 width="64"
                               />
                             </TableCell>

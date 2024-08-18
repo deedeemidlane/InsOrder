@@ -39,6 +39,7 @@ export default function CartPage() {
       name: string;
       price: number;
       quantity: number;
+      image: string | undefined;
     }[]
   >([]);
 
@@ -112,7 +113,7 @@ export default function CartPage() {
               <img
                 alt="Shop image"
                 className="aspect-square w-12 rounded-full border-2 border-red-500 object-cover"
-                src="/hero.png"
+                src="/shop-image.jpg"
               />
               <div className="flex items-center">
                 <h1 className="font-semibold md:text-xl">{shopName}</h1>
@@ -207,7 +208,7 @@ export default function CartPage() {
                         <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
                           <div className="shrink-0 md:order-1">
                             <img
-                              src="/placeholder.svg"
+                              src={product.image}
                               alt="product image"
                               className="h-20 w-20 rounded-md border-2"
                             />
@@ -269,7 +270,7 @@ export default function CartPage() {
                           <div className="flex items-center gap-4">
                             <div className="shrink-0 md:order-1">
                               <img
-                                src="/placeholder.svg"
+                                src={product.image}
                                 alt="product image"
                                 className="h-20 w-20 rounded-md border-2"
                               />

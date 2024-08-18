@@ -70,12 +70,15 @@ export default function AdminPage() {
 
   const [shops, setShops] = useState<TShop[]>([]);
 
+  const [toggleReRender, setToggleReRender] = useState(false);
+
   const handleSubmitForm = async (e: React.FormEvent, inputs: {}) => {
     e.preventDefault();
 
     await createShop(inputs);
 
     setOpenAddShopModal(false);
+    setToggleReRender(!toggleReRender);
   };
 
   useEffect(() => {
@@ -85,7 +88,7 @@ export default function AdminPage() {
     };
 
     fetchShops();
-  }, []);
+  }, [toggleReRender]);
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -223,13 +226,6 @@ export default function AdminPage() {
                         {shops.map((shop, index) => (
                           <TableRow key={index}>
                             <TableCell className="hidden sm:table-cell">
-                              {/* <img
-                                alt="Ảnh đại diện Shop"
-                                className="aspect-square rounded-md object-cover"
-                                height="64"
-                                src={shop.shop.image}
-                                width="64"
-                              /> */}
                               <img
                                 alt="Ảnh đại diện Shop"
                                 className="aspect-square rounded-md object-cover"

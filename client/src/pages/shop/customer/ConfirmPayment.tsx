@@ -31,6 +31,7 @@ export default function ConfirmPaymentPage() {
       name: string | undefined;
       price: number | undefined;
       quantity: number;
+      image: string | undefined;
     }[]
   >([]);
 
@@ -73,7 +74,7 @@ export default function ConfirmPaymentPage() {
               <img
                 alt="Shop image"
                 className="aspect-square w-12 rounded-full border-2 border-red-500 object-cover"
-                src="/hero.png"
+                src="/shop-image.jpg"
               />
               <div className="flex items-center">
                 <h1 className="font-semibold text-xl">{shopName}</h1>

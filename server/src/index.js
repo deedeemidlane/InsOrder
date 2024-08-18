@@ -1,11 +1,12 @@
 import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+
 import authRoutes from "./routes/auth.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import managerRoutes from "./routes/manager.route.js";
 import staffRoutes from "./routes/staff.route.js";
 import customerRoutes from "./routes/customer.route.js";
-import cookieParser from "cookie-parser";
-import cors from "cors";
 
 import dotenv from "dotenv";
 dotenv.config();

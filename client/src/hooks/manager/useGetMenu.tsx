@@ -10,7 +10,6 @@ const useGetMenu = () => {
       const res = await fetch("/api/manager/menu");
 
       const data = await res.json();
-      console.log(data);
 
       if (!res.ok) throw new Error(data.error);
 

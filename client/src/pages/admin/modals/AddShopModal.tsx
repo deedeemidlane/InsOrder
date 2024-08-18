@@ -35,6 +35,7 @@ export default function AddShopModal({
   const [inputs, setInputs] = useState({
     shopName: "",
     accountNo: "",
+    accountName: "",
     acqId: "",
     managerName: "",
     phone: "",
@@ -76,17 +77,6 @@ export default function AddShopModal({
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="image" className="text-right">
-                  Ảnh đại diện
-                </Label>
-                <Input
-                  id="image"
-                  className="col-span-3 p-0"
-                  type="file"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="accountNo" className="text-right">
                   Số tài khoản
                 </Label>
@@ -97,6 +87,20 @@ export default function AddShopModal({
                   pattern={REGEXP_ONLY_DIGITS}
                   onChange={(e) =>
                     setInputs({ ...inputs, accountNo: e.target.value })
+                  }
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="accountName" className="text-right">
+                  Tên tài khoản
+                </Label>
+                <Input
+                  id="accountName"
+                  className="col-span-3"
+                  required
+                  placeholder="Nhập tiếng Việt không dấu, viết hoa"
+                  onChange={(e) =>
+                    setInputs({ ...inputs, accountName: e.target.value })
                   }
                 />
               </div>

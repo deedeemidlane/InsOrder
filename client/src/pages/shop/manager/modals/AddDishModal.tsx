@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "flowbite-react";
 
 import { PlusCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AddDishModal({
   handleSubmitForm,
@@ -20,16 +20,26 @@ export default function AddDishModal({
   setOpen,
   loading,
 }: {
-  handleSubmitForm: (e: React.FormEvent, inputs: {}) => void;
+  handleSubmitForm: (
+    e: React.FormEvent,
+    image: File,
+    name: string,
+    price: number,
+  ) => void;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   loading: boolean;
 }) {
   const [inputs, setInputs] = useState({
     name: "",
-    image: "",
     price: 0,
   });
+
+  const [image, setImage] = useState<File>(new File(["foo"], "foo.txt"));
+
+  useEffect(() => {
+    console.log("image: ", image);
+  }, [image]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -43,7 +53,11 @@ export default function AddDishModal({
         <DialogHeader>
           <DialogTitle className="">Thêm món</DialogTitle>
         </DialogHeader>
-        <form onSubmit={(e) => handleSubmitForm(e, inputs)}>
+        <form
+          onSubmit={(e) =>
+            handleSubmitForm(e, image, inputs.name, inputs.price)
+          }
+        >
           <div className="max-h-[500px] overflow-auto">
             <hr />
             <div className="grid gap-4 py-4 sm:px-2">
@@ -71,6 +85,12 @@ export default function AddDishModal({
                   className="col-span-3 p-0"
                   type="file"
                   required
+                  onChange={(e) => {
+                    // console.log(e.target.files[0]);
+                    if (e.target.files) {
+                      setImage(e.target.files[0]);
+                    }
+                  }}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -82,7 +102,7 @@ export default function AddDishModal({
                   className="col-span-3"
                   required
                   type="number"
-                  value={inputs.price}
+                  value={inputs.price || ""}
                   onChange={(e) =>
                     setInputs({ ...inputs, price: parseInt(e.target.value) })
                   }

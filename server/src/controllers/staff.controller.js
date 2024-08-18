@@ -67,7 +67,7 @@ export const updateOrderStatus = async (req, res) => {
       if (deleteOrder) {
         return res
           .status(200)
-          .json({ message: "Đã xóa đơn hàng", nextStatus: "COMPLETED" });
+          .json({ message: "Đã xóa đơn hàng", nextStatus: "PROCESSING" });
       } else {
         return res.status(404).json({ error: "Cập nhật thất bại" });
       }

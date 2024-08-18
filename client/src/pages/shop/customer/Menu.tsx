@@ -44,6 +44,7 @@ export default function MenuPage() {
       name: string | undefined;
       price: number | undefined;
       quantity: number;
+      image: string | undefined;
     }[]
   >([]);
 
@@ -75,6 +76,7 @@ export default function MenuPage() {
         name: product?.name,
         price: product?.price,
         quantity: 1,
+        image: product?.image,
       });
     }
 
@@ -95,7 +97,7 @@ export default function MenuPage() {
               <img
                 alt="Shop image"
                 className="aspect-square w-12 rounded-full border-2 border-red-500 object-cover"
-                src="/hero.png"
+                src="/shop-image.jpg"
               />
               <div className="flex items-center">
                 <h1 className="font-semibold md:text-xl">{shopName}</h1>
@@ -182,7 +184,7 @@ export default function MenuPage() {
               <FlowbiteCard className="sm:pr-8" key={product.id}>
                 <div className="flex gap-4">
                   <img
-                    src="/placeholder.svg"
+                    src={product.image}
                     alt="product image"
                     className="h-24 w-24 object-cover border-2 rounded-md"
                   />

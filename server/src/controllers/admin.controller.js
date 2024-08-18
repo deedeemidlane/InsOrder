@@ -19,8 +19,8 @@ export const createShop = async (req, res) => {
 
     const {
       shopName,
-      image,
       accountNo,
+      accountName,
       acqId,
       managerName,
       username,
@@ -41,7 +41,7 @@ export const createShop = async (req, res) => {
     const newShop = await prisma.shop.create({
       data: {
         name: shopName,
-        image: "",
+        accountName,
         accountNo,
         acqId,
         shopUrl,

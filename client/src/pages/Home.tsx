@@ -1,13 +1,10 @@
-import logo from "/logo.png";
-import heroImg from "/hero.png";
-
-function HomePage() {
+export default function HomePage() {
   return (
     <>
       <header className="fixed top-0 w-full  z-30 bg-white transition-all">
         <nav className="max-w-screen-xl px-6 sm:px-8 lg:px-16 mx-auto grid grid-flow-col py-3 sm:py-4">
           <div className="col-start-1 col-end-2 flex items-center">
-            <img className="h-12 w-auto" src={logo} alt="logo" />
+            <img className="h-12 w-auto" src="/logo.png" alt="logo" />
             <span className="ml-2 hidden self-center whitespace-nowrap text-2xl sm:inline">
               Ins
             </span>
@@ -40,12 +37,10 @@ function HomePage() {
             </button>
           </div>
           <div className="flex w-full">
-            <img src={heroImg} alt="Hero image" />
+            <img src="/hero.png" alt="Hero image" />
           </div>
         </div>
       </div>
     </>
   );
 }
-
-export default HomePage;
