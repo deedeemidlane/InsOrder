@@ -2,8 +2,6 @@ import prisma from "../db/prisma.js";
 
 export const getOrders = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "STAFF") {
       return res.status(401).json({ error: "Unauthorized - Not staff token" });
     }
@@ -21,8 +19,6 @@ export const getOrders = async (req, res) => {
       },
     });
 
-    console.log(orders);
-
     if (orders) {
       res.status(200).json(orders);
     } else {
@@ -36,8 +32,6 @@ export const getOrders = async (req, res) => {
 
 export const updateOrderStatus = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "STAFF") {
       return res.status(401).json({ error: "Unauthorized - Not staff token" });
     }

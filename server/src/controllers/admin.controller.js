@@ -11,8 +11,6 @@ export function generateUrl(shopName) {
 
 export const createShop = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "ADMIN") {
       return res.status(401).json({ error: "Unauthorized - Not admin token" });
     }
@@ -76,8 +74,6 @@ export const createShop = async (req, res) => {
 
 export const getShops = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "ADMIN") {
       return res.status(401).json({ error: "Unauthorized - Not admin token" });
     }
@@ -103,8 +99,6 @@ export const getShops = async (req, res) => {
         shop: true,
       },
     });
-
-    console.log(shopsWithManagers);
 
     if (shopsWithManagers) {
       res.status(200).json(shopsWithManagers);

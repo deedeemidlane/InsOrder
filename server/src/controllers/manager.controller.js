@@ -1,10 +1,9 @@
+// import cloudinary from "../configs/cloudinaryConfig.js";
 import prisma from "../db/prisma.js";
 import bcryptjs from "bcryptjs";
 
 export const getShopInfo = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "MANAGER") {
       return res
         .status(401)
@@ -21,8 +20,6 @@ export const getShopInfo = async (req, res) => {
         shop: true,
       },
     });
-
-    console.log(shopInfo);
 
     if (shopInfo) {
       res.status(200).json(shopInfo);
@@ -45,7 +42,30 @@ export const createDish = async (req, res) => {
 
     const { name, price } = req.body;
 
-    const image = "/TempStorage/" + req.file.filename;
+    console.log("req.file: ", req.file);
+
+    // const image = req.file.path;
+
+    // const result = await cloudinary.uploader.upload(image, {
+    //   asset_folder: "insorder-menu",
+    //   resource_type: "image",
+    // });
+
+    // console.log("Upload image result: ", result);
+
+    const imagePath = req.file.path;
+
+    /* Shorten url:
+      'https://res.cloudinary.com/.../image/upload/v1725527707/insorder-menu/uxicwxymg6pruk9ersmj.webp'
+      -> 'v1725527707/insorder-menu/uxicwxymg6pruk9ersmj.webp'
+    */
+
+    const image = imagePath.slice(
+      imagePath.lastIndexOf(
+        "/",
+        imagePath.indexOf("/" + req.file.filename) - 1,
+      ) + 1,
+    );
 
     const newDish = await prisma.product.create({
       data: {
@@ -63,7 +83,7 @@ export const createDish = async (req, res) => {
     }
   } catch (error) {
     console.log("Error in createDish controller: ", error.message);
-    res.status(500).json({ error: "Lỗi hệ thống" });
+    res.status(500).json({ error: "Lỗi hệ thống", message: error.message });
   }
 };
 
@@ -78,6 +98,9 @@ export const getMenu = async (req, res) => {
     const products = await prisma.product.findMany({
       where: {
         shopId: req.payload.shopId,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
@@ -128,8 +151,6 @@ export const createStaffAccount = async (req, res) => {
 
 export const getStaffs = async (req, res) => {
   try {
-    console.log(req.payload);
-
     if (req.payload.role !== "MANAGER") {
       return res
         .status(401)
@@ -142,8 +163,6 @@ export const getStaffs = async (req, res) => {
         role: "STAFF",
       },
     });
-
-    console.log(staffs);
 
     if (staffs) {
       res.status(200).json(staffs);

@@ -9,14 +9,24 @@ import {
 } from "../controllers/manager.controller.js";
 
 import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../configs/cloudinaryConfig.js";
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "../client/public/TempStorage/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now();
-    cb(null, uniqueSuffix + file.originalname);
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "../client/public/TempStorage/");
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now();
+//     cb(null, uniqueSuffix + file.originalname);
+//   },
+// });
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "insorder-menu",
+    // allowed_formats: ["jpeg", "png", "jpg"],
   },
 });
 

@@ -45,7 +45,6 @@ export const placeOrder = async (req, res) => {
 export const getMenu = async (req, res) => {
   try {
     const { shopUrl } = req.body;
-    console.log(shopUrl);
 
     const shop = await prisma.shop.findFirst({ where: { shopUrl } });
 
@@ -53,9 +52,10 @@ export const getMenu = async (req, res) => {
       where: {
         shopId: shop.id,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
-
-    console.log(products);
 
     if (products) {
       res.status(200).json({ products: products, shopName: shop.name });
