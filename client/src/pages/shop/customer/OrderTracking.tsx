@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import useGetMenu from "@/hooks/customer/useGetMenu";
 
 import useGetOrder from "@/hooks/customer/useGetOrder";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function generateOrderStatusButton(orderStatus: string | undefined) {
   switch (orderStatus) {
@@ -148,12 +149,14 @@ export default function OrderTrackingPage() {
 
   const [order, setOrder] = useState<TOrder>();
 
-  const { getOrder } = useGetOrder();
+  const { loading, getOrder } = useGetOrder();
 
   const [orderId, setOrderId] = useState<number | null>(null);
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setOrder(undefined);
 
     const res = await getOrder(orderId || 0, shopUrl || "");
 
@@ -258,16 +261,43 @@ export default function OrderTrackingPage() {
                   type="number"
                   placeholder="Nhập mã đơn hàng"
                   required
-                  className="z-0 h-14 w-full rounded-lg border-2 pl-5 pr-20 focus:shadow focus:outline-none"
+                  className="z-0 h-14 w-full rounded-lg border-2 pl-5 pr-28 focus:shadow focus:outline-none"
                   value={orderId || ""}
                   onChange={(e) => setOrderId(parseInt(e.target.value))}
                 />
-                <ShadButton type="submit" className="absolute right-2 top-2">
+                <ShadButton
+                  type="submit"
+                  className="absolute right-2 top-2"
+                  disabled={loading}
+                >
                   Tìm kiếm
                 </ShadButton>
               </form>
             </div>
           </div>
+
+          {loading && (
+            <Card className="overflow-hidden mt-3">
+              <CardHeader className="flex flex-row items-start bg-muted/60">
+                <div className="grid gap-1 w-full">
+                  <CardTitle className="group flex items-center gap-2 text-lg">
+                    <Skeleton className="h-4 w-1/4 rounded-xl bg-zinc-200" />
+                  </CardTitle>
+                  <CardDescription className="flex items-center text-black gap-1">
+                    <Skeleton className="h-4 w-1/3 rounded-xl bg-zinc-200" />
+                  </CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6 text-sm">
+                <Skeleton className="h-40 w-full rounded-xl bg-zinc-200" />
+
+                <Separator className="my-4" />
+
+                <Skeleton className="h-8 w-full rounded-lg bg-zinc-200" />
+              </CardContent>
+              <CardFooter className="flex flex-row items-center border-t  bg-muted/60 px-6 py-3"></CardFooter>
+            </Card>
+          )}
 
           {order && (
             <Card className="overflow-hidden mt-3">
