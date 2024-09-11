@@ -53,17 +53,22 @@ export const updateOrderStatus = async (req, res) => {
         },
       });
 
-      const deleteOrder = await prisma.order.delete({
-        where: {
-          id: orderId,
-        },
-      });
-      if (deleteOrder) {
-        return res
-          .status(200)
-          .json({ message: "Đã xóa đơn hàng", nextStatus: "PROCESSING" });
+      if (deleteOrderItems) {
+        const deleteOrder = await prisma.order.delete({
+          where: {
+            id: orderId,
+          },
+        });
+
+        if (deleteOrder) {
+          return res
+            .status(200)
+            .json({ message: "Đã xóa đơn hàng", nextStatus: "PROCESSING" });
+        } else {
+          return res.status(404).json({ error: "Xóa thất bại" });
+        }
       } else {
-        return res.status(404).json({ error: "Cập nhật thất bại" });
+        return res.status(404).json({ error: "Có lỗi xảy ra" });
       }
     }
 
