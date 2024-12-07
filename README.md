@@ -5,3 +5,8 @@
 #### Full documentation: https://docs.google.com/document/d/1r9eBCBA4XAkOQ282epb96XNNAzkev94AEnrgNXujOkE/edit?usp=sharing
 
 #### Demo: https://www.youtube.com/watch?v=CQ3kYKK7nNM
+
+
+### Note:
+
+After modify `schema.prisma` file, run `npx prisma db push`
