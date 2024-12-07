@@ -1,22 +1,6 @@
-import {
-  CircleUser,
-  Menu,
-  HandPlatter,
-  HandCoins,
-  AlarmClock,
-  ChefHat,
-  Trash2,
-} from "lucide-react";
+import { CircleUser, Menu, HandPlatter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,23 +12,16 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Separator } from "@/components/ui/separator";
-
-import "../../../index.css";
 import useLogout from "@/hooks/authentication/useLogout";
 import { useAuthContext } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useGetOrders from "@/hooks/staff/useGetOrders";
-import {
-  formatDate,
-  formatPriceInVND,
-  formatTime,
-} from "@/utils/helperFunctions";
 import { Spinner } from "flowbite-react";
 import useUpdateOrderStatus from "@/hooks/staff/useUpdateOrderStatus";
+import Tab from "./_components/Tab";
 
-type TOrder = {
+export type TOrder = {
   id: number;
   customerName: string;
   tableNo: number;
@@ -76,9 +53,12 @@ export default function StaffPage() {
 
   const [orders, setOrders] = useState<TOrder[]>();
 
+  const [currentOrderId, setCurrentOrderId] = useState<number>();
+
   const { loading: getOrdersLoading, getOrders } = useGetOrders();
 
-  const { updateOrderStatus } = useUpdateOrderStatus();
+  const { loading: updateOrderLoading, updateOrderStatus } =
+    useUpdateOrderStatus();
 
   const [tab, setTab] = useState("processing");
 
@@ -90,9 +70,10 @@ export default function StaffPage() {
     };
 
     fetchOrders();
-  }, [tab]);
+  }, [tab, currentOrderId]);
 
   const updateStatus = async (orderId: number) => {
+    setCurrentOrderId(orderId);
     const nextStatus = await updateOrderStatus(orderId);
     setTab(nextStatus.toLowerCase());
   };
@@ -190,472 +171,48 @@ export default function StaffPage() {
                 </TabsList>
               </div>
               <TabsContent value="processing">
-                <Card
-                  x-chunk="dashboard-06-chunk-0"
-                  className="overflow-y-auto h-[80vh]"
-                >
-                  <CardHeader>
-                    <CardTitle>Đơn hàng chờ xác nhận</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4 xl:gap-8">
-                      {orders
-                        ?.filter((order) => order.status === "PROCESSING")
-                        .map((order) => (
-                          <div key={order.id}>
-                            <Card
-                              className="overflow-hidden"
-                              x-chunk="dashboard-05-chunk-4"
-                            >
-                              <CardHeader className="flex flex-row items-start bg-yellow-300/60">
-                                <div className="grid gap-0.5">
-                                  <CardTitle className="group flex items-center gap-2 text-lg">
-                                    Đơn số{" "}
-                                    <span className="font-thin">
-                                      #{order.id}
-                                    </span>
-                                  </CardTitle>
-                                  <CardDescription>
-                                    <div className="flex items-center text-black gap-1">
-                                      <AlarmClock className="h-5" />
-                                      {formatTime(order.createdAt)}{" "}
-                                      {formatDate(order.createdAt)}
-                                    </div>
-                                  </CardDescription>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="p-6 text-sm">
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Chi tiết đơn hàng
-                                  </div>
-                                  <ul className="grid gap-3">
-                                    {order.orderItems.map((orderItem) => (
-                                      <li className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">
-                                          {orderItem.product.name} x{" "}
-                                          <span>{orderItem.quantity}</span>
-                                        </span>
-                                        <span>
-                                          {formatPriceInVND(
-                                            orderItem.product.price,
-                                          )}
-                                        </span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                  <Separator className="my-2" />
-                                  <ul className="grid gap-3">
-                                    <li className="flex items-center justify-between font-semibold">
-                                      <span className="text-muted-foreground">
-                                        Tổng
-                                      </span>
-                                      <span>
-                                        {formatPriceInVND(
-                                          order.orderItems.reduce(
-                                            (accumulator, currentValue) =>
-                                              accumulator +
-                                              currentValue.product.price *
-                                                currentValue.quantity,
-                                            0,
-                                          ),
-                                        )}
-                                      </span>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <Separator className="my-4" />
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Thông tin thêm
-                                  </div>
-                                  <dl className="grid gap-3">
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Khách hàng
-                                      </dt>
-                                      <dd>{order.customerName}</dd>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Bàn số
-                                      </dt>
-                                      <dd>{order.tableNo}</dd>
-                                    </div>
-                                  </dl>
-                                </div>
-                                <Separator className="my-4" />
-                                <div className="flex items-center gap-4">
-                                  <Button
-                                    size="sm"
-                                    className="w-full"
-                                    variant="outline"
-                                    onClick={() => updateStatus(order.id)}
-                                  >
-                                    <HandCoins className="h-4 mr-1" />
-                                    Xác nhận thanh toán
-                                  </Button>
-                                </div>
-                              </CardContent>
-                              <CardFooter className="flex flex-row items-center border-t bg-yellow-300/60 px-6 py-3"></CardFooter>
-                            </Card>
-                          </div>
-                        ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <Tab
+                  orders={orders?.filter(
+                    (order) => order.status === "PROCESSING",
+                  )}
+                  updateStatus={updateStatus}
+                  updateOrderLoading={updateOrderLoading}
+                  tabValue="processing"
+                  currentOrderId={currentOrderId}
+                />
               </TabsContent>
               <TabsContent value="confirmed">
-                <Card
-                  x-chunk="dashboard-06-chunk-0"
-                  className="overflow-y-auto h-[80vh]"
-                >
-                  <CardHeader>
-                    <CardTitle>Đơn hàng đã thanh toán</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4 xl:gap-8">
-                      {orders
-                        ?.filter((order) => order.status === "CONFIRMED")
-                        .map((order) => (
-                          <div key={order.id}>
-                            <Card
-                              className="overflow-hidden"
-                              x-chunk="dashboard-05-chunk-4"
-                            >
-                              <CardHeader className="flex flex-row items-start bg-teal-400/60">
-                                <div className="grid gap-0.5">
-                                  <CardTitle className="group flex items-center gap-2 text-lg">
-                                    Đơn số{" "}
-                                    <span className="font-thin">
-                                      #{order.id}
-                                    </span>
-                                  </CardTitle>
-                                  <CardDescription>
-                                    <div className="flex items-center text-black gap-1">
-                                      <AlarmClock className="h-5" />
-                                      {formatTime(order.createdAt)}{" "}
-                                      {formatDate(order.createdAt)}
-                                    </div>
-                                  </CardDescription>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="p-6 text-sm">
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Chi tiết đơn hàng
-                                  </div>
-                                  <ul className="grid gap-3">
-                                    {order.orderItems.map((orderItem) => (
-                                      <li className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">
-                                          {orderItem.product.name} x{" "}
-                                          <span>{orderItem.quantity}</span>
-                                        </span>
-                                        <span>
-                                          {formatPriceInVND(
-                                            orderItem.product.price,
-                                          )}
-                                        </span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                  <Separator className="my-2" />
-                                  <ul className="grid gap-3">
-                                    <li className="flex items-center justify-between font-semibold">
-                                      <span className="text-muted-foreground">
-                                        Tổng
-                                      </span>
-                                      <span>
-                                        {formatPriceInVND(
-                                          order.orderItems.reduce(
-                                            (accumulator, currentValue) =>
-                                              accumulator +
-                                              currentValue.product.price *
-                                                currentValue.quantity,
-                                            0,
-                                          ),
-                                        )}
-                                      </span>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <Separator className="my-4" />
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Thông tin thêm
-                                  </div>
-                                  <dl className="grid gap-3">
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Khách hàng
-                                      </dt>
-                                      <dd>{order.customerName}</dd>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Bàn số
-                                      </dt>
-                                      <dd>{order.tableNo}</dd>
-                                    </div>
-                                  </dl>
-                                </div>
-                                <Separator className="my-4" />
-                                <div className="flex items-center gap-4">
-                                  <Button
-                                    size="sm"
-                                    className="w-full"
-                                    variant="outline"
-                                    onClick={() => updateStatus(order.id)}
-                                  >
-                                    <ChefHat className="h-4 mr-1" />
-                                    Chuẩn bị món
-                                  </Button>
-                                </div>
-                              </CardContent>
-                              <CardFooter className="flex flex-row items-center border-t  bg-teal-400/60 px-6 py-3"></CardFooter>
-                            </Card>
-                          </div>
-                        ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <Tab
+                  orders={orders?.filter(
+                    (order) => order.status === "CONFIRMED",
+                  )}
+                  updateStatus={updateStatus}
+                  updateOrderLoading={updateOrderLoading}
+                  tabValue="confirmed"
+                  currentOrderId={currentOrderId}
+                />
               </TabsContent>
               <TabsContent value="preparing">
-                <Card
-                  x-chunk="dashboard-06-chunk-0"
-                  className="overflow-y-auto h-[80vh]"
-                >
-                  <CardHeader>
-                    <CardTitle>Đơn hàng đang chuẩn bị</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4 xl:gap-8">
-                      {orders
-                        ?.filter((order) => order.status === "PREPARING")
-                        .map((order) => (
-                          <div key={order.id}>
-                            <Card
-                              className="overflow-hidden"
-                              x-chunk="dashboard-05-chunk-4"
-                            >
-                              <CardHeader className="flex flex-row items-start bg-red-500 text-white">
-                                <div className="grid gap-0.5">
-                                  <CardTitle className="group flex items-center gap-2 text-lg">
-                                    Đơn số{" "}
-                                    <span className="font-thin">
-                                      #{order.id}
-                                    </span>
-                                  </CardTitle>
-                                  <CardDescription>
-                                    <div className="flex items-center text-white gap-1">
-                                      <AlarmClock className="h-5" />
-                                      {formatTime(order.createdAt)}{" "}
-                                      {formatDate(order.createdAt)}
-                                    </div>
-                                  </CardDescription>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="p-6 text-sm">
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Chi tiết đơn hàng
-                                  </div>
-                                  <ul className="grid gap-3">
-                                    {order.orderItems.map((orderItem) => (
-                                      <li className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">
-                                          {orderItem.product.name} x{" "}
-                                          <span>{orderItem.quantity}</span>
-                                        </span>
-                                        <span>
-                                          {formatPriceInVND(
-                                            orderItem.product.price,
-                                          )}
-                                        </span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                  <Separator className="my-2" />
-                                  <ul className="grid gap-3">
-                                    <li className="flex items-center justify-between font-semibold">
-                                      <span className="text-muted-foreground">
-                                        Tổng
-                                      </span>
-                                      <span>
-                                        {formatPriceInVND(
-                                          order.orderItems.reduce(
-                                            (accumulator, currentValue) =>
-                                              accumulator +
-                                              currentValue.product.price *
-                                                currentValue.quantity,
-                                            0,
-                                          ),
-                                        )}
-                                      </span>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <Separator className="my-4" />
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Thông tin thêm
-                                  </div>
-                                  <dl className="grid gap-3">
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Khách hàng
-                                      </dt>
-                                      <dd>{order.customerName}</dd>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Bàn số
-                                      </dt>
-                                      <dd>{order.tableNo}</dd>
-                                    </div>
-                                  </dl>
-                                </div>
-                                <Separator className="my-4" />
-                                <div className="flex items-center gap-4">
-                                  <Button
-                                    size="sm"
-                                    className="w-full"
-                                    variant="outline"
-                                    onClick={() => updateStatus(order.id)}
-                                  >
-                                    <HandPlatter className="h-4 mr-1" />
-                                    Phục vụ
-                                  </Button>
-                                </div>
-                              </CardContent>
-                              <CardFooter className="flex flex-row items-center border-t bg-red-500 px-6 py-3"></CardFooter>
-                            </Card>
-                          </div>
-                        ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <Tab
+                  orders={orders?.filter(
+                    (order) => order.status === "PREPARING",
+                  )}
+                  updateStatus={updateStatus}
+                  updateOrderLoading={updateOrderLoading}
+                  tabValue="preparing"
+                  currentOrderId={currentOrderId}
+                />
               </TabsContent>
               <TabsContent value="completed">
-                <Card
-                  x-chunk="dashboard-06-chunk-0"
-                  className="overflow-y-auto h-[80vh]"
-                >
-                  <CardHeader>
-                    <CardTitle>Đơn hàng đã hoàn tất</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-2 gap-4 xl:gap-8">
-                      {orders
-                        ?.filter((order) => order.status === "COMPLETED")
-                        .map((order) => (
-                          <div key={order.id}>
-                            <Card
-                              className="overflow-hidden"
-                              x-chunk="dashboard-05-chunk-4"
-                            >
-                              <CardHeader className="flex flex-row items-start bg-green-500/80 text-white">
-                                <div className="grid gap-0.5">
-                                  <CardTitle className="group flex items-center gap-2 text-lg">
-                                    Đơn số{" "}
-                                    <span className="font-thin">
-                                      #{order.id}
-                                    </span>
-                                  </CardTitle>
-                                  <CardDescription>
-                                    <div className="flex items-center text-white gap-1">
-                                      <AlarmClock className="h-5" />
-                                      {formatTime(order.createdAt)}{" "}
-                                      {formatDate(order.createdAt)}
-                                    </div>
-                                  </CardDescription>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="p-6 text-sm">
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Chi tiết đơn hàng
-                                  </div>
-                                  <ul className="grid gap-3">
-                                    {order.orderItems.map((orderItem) => (
-                                      <li className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">
-                                          {orderItem.product.name} x{" "}
-                                          <span>{orderItem.quantity}</span>
-                                        </span>
-                                        <span>
-                                          {formatPriceInVND(
-                                            orderItem.product.price,
-                                          )}
-                                        </span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                  <Separator className="my-2" />
-                                  <ul className="grid gap-3">
-                                    <li className="flex items-center justify-between font-semibold">
-                                      <span className="text-muted-foreground">
-                                        Tổng
-                                      </span>
-                                      <span>
-                                        {formatPriceInVND(
-                                          order.orderItems.reduce(
-                                            (accumulator, currentValue) =>
-                                              accumulator +
-                                              currentValue.product.price *
-                                                currentValue.quantity,
-                                            0,
-                                          ),
-                                        )}
-                                      </span>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <Separator className="my-4" />
-                                <div className="grid gap-3">
-                                  <div className="font-semibold">
-                                    Thông tin thêm
-                                  </div>
-                                  <dl className="grid gap-3">
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Khách hàng
-                                      </dt>
-                                      <dd>{order.customerName}</dd>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                      <dt className="text-muted-foreground">
-                                        Bàn số
-                                      </dt>
-                                      <dd>{order.tableNo}</dd>
-                                    </div>
-                                  </dl>
-                                </div>
-                                <Separator className="my-4" />
-                                <div className="flex items-center gap-4">
-                                  <Button
-                                    size="sm"
-                                    className="w-full"
-                                    variant="outline"
-                                    onClick={() => updateStatus(order.id)}
-                                  >
-                                    <Trash2 className="h-4 mr-1" />
-                                    Xóa
-                                  </Button>
-                                </div>
-                              </CardContent>
-                              <CardFooter className="flex flex-row items-center border-t bg-green-500/80 px-6 py-3"></CardFooter>
-                            </Card>
-                          </div>
-                        ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <Tab
+                  orders={orders?.filter(
+                    (order) => order.status === "COMPLETED",
+                  )}
+                  updateStatus={updateStatus}
+                  updateOrderLoading={updateOrderLoading}
+                  tabValue="completed"
+                  currentOrderId={currentOrderId}
+                />
               </TabsContent>
             </Tabs>
           )}

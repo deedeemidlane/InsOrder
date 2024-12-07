@@ -38,7 +38,6 @@ export default function AddShopModal({
     accountName: "",
     acqId: "",
     managerName: "",
-    phone: "",
     username: "",
     password: "",
   });
@@ -147,22 +146,6 @@ export default function AddShopModal({
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phone" className="text-right">
-                  Số điện thoại
-                </Label>
-                <Input
-                  id="phone"
-                  minLength={10}
-                  maxLength={10}
-                  className="col-span-3"
-                  type="tel"
-                  required
-                  onChange={(e) =>
-                    setInputs({ ...inputs, phone: e.target.value })
-                  }
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="username" className="text-right">
                   Tên đăng nhập
                 </Label>
@@ -202,7 +185,7 @@ export default function AddShopModal({
             <div className="flex gap-2 justify-end">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Hủy bỏ
+                  Hủy
                 </Button>
               </DialogClose>
               <Button type="submit">Lưu</Button>

@@ -262,7 +262,10 @@ export default function MenuManagementPage() {
                                 alt="Ảnh minh họa món"
                                 className="aspect-square rounded-md object-cover"
                                 height="64"
-                                src={product.image}
+                                src={
+                                  `http://res.cloudinary.com/${import.meta.env.VITE_CLOUD_NAME}/image/upload/` +
+                                  product.image
+                                }
                                 width="64"
                               />
                             </TableCell>

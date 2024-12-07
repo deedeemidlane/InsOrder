@@ -1,18 +1,21 @@
+import { useState } from "react";
+
+import { Spinner } from "flowbite-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Spinner } from "flowbite-react";
 
 import { PlusCircle } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export default function AddDishModal({
   handleSubmitForm,
@@ -37,10 +40,6 @@ export default function AddDishModal({
 
   const [image, setImage] = useState<File>(new File(["foo"], "foo.txt"));
 
-  useEffect(() => {
-    console.log("image: ", image);
-  }, [image]);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -53,6 +52,7 @@ export default function AddDishModal({
         <DialogHeader>
           <DialogTitle className="">Thêm món</DialogTitle>
         </DialogHeader>
+        <DialogDescription className="hidden"></DialogDescription>
         <form
           onSubmit={(e) =>
             handleSubmitForm(e, image, inputs.name, inputs.price)
@@ -85,6 +85,7 @@ export default function AddDishModal({
                   className="col-span-3 p-0"
                   type="file"
                   required
+                  accept="image/*"
                   onChange={(e) => {
                     // console.log(e.target.files[0]);
                     if (e.target.files) {
@@ -121,7 +122,7 @@ export default function AddDishModal({
             <div className="flex gap-2 justify-end">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Hủy bỏ
+                  Hủy
                 </Button>
               </DialogClose>
               <Button type="submit">Lưu</Button>

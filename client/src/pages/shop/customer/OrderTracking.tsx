@@ -37,39 +37,39 @@ function generateOrderStatusButton(orderStatus: string | undefined) {
   switch (orderStatus) {
     case "PROCESSING":
       return (
-        <Button
+        <ShadButton
           size="sm"
           className="w-full bg-yellow-300/60 text-black disabled:opacity-80"
           disabled
         >
           <HandCoins className="h-4 mr-1" />
           Đang xử lý
-        </Button>
+        </ShadButton>
       );
 
     case "CONFIRMED":
     case "PREPARING":
       return (
-        <Button
+        <ShadButton
           size="sm"
           className="w-full bg-red-500 disabled:opacity-80"
           disabled
         >
           <ChefHat className="h-4 mr-1" />
           Đang chuẩn bị
-        </Button>
+        </ShadButton>
       );
 
     case "COMPLETED":
       return (
-        <Button
+        <ShadButton
           size="sm"
           className="w-full bg-green-500/80 disabled:opacity-80"
           disabled
         >
           <CircleCheck className="h-4 mr-1" />
           Đã xong
-        </Button>
+        </ShadButton>
       );
 
     default:

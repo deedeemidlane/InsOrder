@@ -104,7 +104,7 @@ export default function AddStaffModal({
             <div className="flex gap-2 justify-end">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Hủy bỏ
+                  Hủy
                 </Button>
               </DialogClose>
               <Button type="submit">Lưu</Button>

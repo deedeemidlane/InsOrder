@@ -77,7 +77,11 @@ export default function StaffManagementPage() {
     await createStaffAccount(inputs);
 
     setOpenAddStaffAccountModal(false);
+
+    setToggleReRender(!toggleReRender);
   };
+
+  const [toggleReRender, setToggleReRender] = useState(false);
 
   useEffect(() => {
     const fetchStaffs = async () => {
@@ -86,7 +90,7 @@ export default function StaffManagementPage() {
     };
 
     fetchStaffs();
-  }, [createStaffAccountLoading]);
+  }, [toggleReRender]);
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

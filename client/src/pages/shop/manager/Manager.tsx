@@ -41,6 +41,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import useLogout from "@/hooks/authentication/useLogout";
 import useGetShopInfo from "@/hooks/manager/useGetShopInfo";
+import { Spinner } from "flowbite-react";
 
 type TShop = {
   name: string;
@@ -70,7 +71,7 @@ export default function ManagerPage() {
 
   const { logout } = useLogout();
 
-  const { getShopInfo } = useGetShopInfo();
+  const { loading, getShopInfo } = useGetShopInfo();
 
   const [shopInfo, setShopInfo] = useState<TShop>();
 
@@ -189,155 +190,168 @@ export default function ManagerPage() {
         </header>
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-5 md:gap-8 bg-muted/40">
           <div className="mx-auto grid max-w-[60rem] flex-1 auto-rows-max gap-4">
-            <div className="grid gap-4 lg:grid-cols-4 lg:gap-8">
-              <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-                <Card x-chunk="dashboard-07-chunk-0">
-                  <CardHeader>
-                    <CardTitle>Thông tin cửa hàng</CardTitle>
-                    <CardDescription>
-                      Cập nhật thông tin cửa hàng của bạn tại đây.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-4 gap-4 mb-4">
-                      <div>
-                        <img
-                          alt="Shop image"
-                          className="aspect-square w-full rounded-full border-2 object-cover"
-                          height="84"
-                          src="/shop-image.jpg"
-                          width="84"
-                        />
-                      </div>
-                      <div className="flex items-center col-span-2">
-                        <h1 className="font-semibold text-xl">
-                          {shopInfo?.shop.name}
-                        </h1>
-                      </div>
-                    </div>
-                    <div className="grid gap-4 py-4 sm:px-2">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="shopName" className="text-right">
-                          Tên
-                        </Label>
-                        <Input
-                          id="shopName"
-                          className="col-span-3"
-                          placeholder="Nhập tên cửa hàng"
-                          defaultValue={shopInfo?.shop.name}
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="accountNo" className="text-right">
-                          Số tài khoản
-                        </Label>
-                        <Input
-                          id="accountNo"
-                          className="col-span-3"
-                          defaultValue={shopInfo?.shop.accountNo}
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="accountNo" className="text-right">
-                          Tên tài khoản
-                        </Label>
-                        <Input
-                          id="accountNo"
-                          className="col-span-3"
-                          defaultValue={shopInfo?.shop.accountName}
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="BIN" className="text-right">
-                          Mã BIN ngân hàng
-                        </Label>
-                        <InputOTP
-                          maxLength={6}
-                          pattern={REGEXP_ONLY_DIGITS}
-                          value={shopInfo?.shop.acqId}
-                        >
-                          <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
-                          </InputOTPGroup>
-                        </InputOTP>
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="status" className="text-right">
-                          Trạng thái
-                        </Label>
-                        <div className="col-span-3">
-                          <Select value={shopInfo?.shop.active ? "1" : "0"}>
-                            <SelectTrigger
-                              id="status"
-                              aria-label="Select status"
+            {loading ? (
+              <Spinner size="xl" color="failure" className="mt-10" />
+            ) : (
+              <div className="grid gap-4 lg:grid-cols-4 lg:gap-8">
+                <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
+                  <Card x-chunk="dashboard-07-chunk-0">
+                    <CardHeader>
+                      <CardTitle>Thông tin cửa hàng</CardTitle>
+                      <CardDescription>
+                        Cập nhật thông tin cửa hàng của bạn tại đây.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <img
+                            alt="Shop image"
+                            className="aspect-square w-full rounded-full border-2 object-cover"
+                            height="84"
+                            src="/shop-image.jpg"
+                            width="84"
+                          />
+                        </div>
+                        <div className="flex items-center col-span-2">
+                          <div>
+                            <h1 className="font-semibold text-xl">
+                              {shopInfo?.shop.name}
+                            </h1>
+                            <a
+                              href={`http://localhost:5173/shop/public/${shopInfo?.shop.shopUrl}`}
+                              className="text-blue-600 hover:border-b-2 hover:border-b-blue-600"
+                              target="_blank"
                             >
-                              <SelectValue placeholder="Lựa chọn trạng thái" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">Hoạt động</SelectItem>
-                              <SelectItem value="0">Tạm dừng</SelectItem>
-                            </SelectContent>
-                          </Select>
+                              {`http://localhost:5173/shop/public/${shopInfo?.shop.shopUrl}`}
+                            </a>
+                          </div>
                         </div>
                       </div>
-                      <div className="grid gap-6">
-                        <div className="grid gap-3"></div>
+                      <div className="grid gap-4 py-4 sm:px-2">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="shopName" className="text-right">
+                            Tên
+                          </Label>
+                          <Input
+                            id="shopName"
+                            className="col-span-3"
+                            placeholder="Nhập tên cửa hàng"
+                            defaultValue={shopInfo?.shop.name}
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="accountNo" className="text-right">
+                            Số tài khoản
+                          </Label>
+                          <Input
+                            id="accountNo"
+                            className="col-span-3"
+                            defaultValue={shopInfo?.shop.accountNo}
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="accountNo" className="text-right">
+                            Tên tài khoản
+                          </Label>
+                          <Input
+                            id="accountNo"
+                            className="col-span-3"
+                            defaultValue={shopInfo?.shop.accountName}
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="BIN" className="text-right">
+                            Mã BIN ngân hàng
+                          </Label>
+                          <InputOTP
+                            maxLength={6}
+                            pattern={REGEXP_ONLY_DIGITS}
+                            value={shopInfo?.shop.acqId}
+                          >
+                            <InputOTPGroup>
+                              <InputOTPSlot index={0} />
+                              <InputOTPSlot index={1} />
+                              <InputOTPSlot index={2} />
+                              <InputOTPSlot index={3} />
+                              <InputOTPSlot index={4} />
+                              <InputOTPSlot index={5} />
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="status" className="text-right">
+                            Trạng thái
+                          </Label>
+                          <div className="col-span-3">
+                            <Select value={shopInfo?.shop.active ? "1" : "0"}>
+                              <SelectTrigger
+                                id="status"
+                                aria-label="Select status"
+                              >
+                                <SelectValue placeholder="Lựa chọn trạng thái" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1">Hoạt động</SelectItem>
+                                <SelectItem value="0">Tạm dừng</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="grid gap-6">
+                          <div className="grid gap-3"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Button size="sm" className="w-full">
-                        Lưu thay đổi
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="flex items-center gap-4">
+                        <Button size="sm" className="w-full">
+                          Lưu thay đổi
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
+                  <Card x-chunk="dashboard-07-chunk-3">
+                    <CardHeader>
+                      <CardTitle>Thông tin quản lý</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4 py-4 sm:px-2">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="managerName" className="text-right">
+                            Họ và tên
+                          </Label>
+                          <Input
+                            id="managerName"
+                            className="col-span-3"
+                            placeholder="Nhập tên quản lý"
+                            defaultValue={shopInfo?.name}
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="username" className="text-right">
+                            Tên đăng nhập
+                          </Label>
+                          <Input
+                            id="username"
+                            className="col-span-3"
+                            defaultValue={shopInfo?.username}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <div className="gap-2 md:flex w-full">
+                        <Button size="sm" className="w-full">
+                          Lưu thay đổi
+                        </Button>
+                        <ChangePasswordModal />
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </div>
               </div>
-              <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-                <Card x-chunk="dashboard-07-chunk-3">
-                  <CardHeader>
-                    <CardTitle>Thông tin quản lý</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 py-4 sm:px-2">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="managerName" className="text-right">
-                          Họ và tên
-                        </Label>
-                        <Input
-                          id="managerName"
-                          className="col-span-3"
-                          placeholder="Nhập tên quản lý"
-                          defaultValue={shopInfo?.name}
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="username" className="text-right">
-                          Tên đăng nhập
-                        </Label>
-                        <Input
-                          id="username"
-                          className="col-span-3"
-                          defaultValue={shopInfo?.username}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="gap-2 md:flex w-full">
-                      <Button size="sm" className="w-full">
-                        Lưu thay đổi
-                      </Button>
-                      <ChangePasswordModal />
-                    </div>
-                  </CardFooter>
-                </Card>
-              </div>
-            </div>
+            )}
           </div>
         </main>
       </div>

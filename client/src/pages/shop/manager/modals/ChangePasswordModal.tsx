@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  // DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -11,15 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import { REGEXP_ONLY_DIGITS } from "input-otp";
-
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { PlusCircle } from "lucide-react";
 
 export default function ChangePasswordModal() {
   return (
@@ -63,7 +53,7 @@ export default function ChangePasswordModal() {
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="secondary">
-              Hủy bỏ
+              Hủy
             </Button>
           </DialogClose>
           <Button type="submit">Lưu</Button>
