@@ -6,7 +6,6 @@
 
 #### Demo: https://www.youtube.com/watch?v=CQ3kYKK7nNM
 
-
 ### Note:
 
 After modify `schema.prisma` file, run `npx prisma db push`

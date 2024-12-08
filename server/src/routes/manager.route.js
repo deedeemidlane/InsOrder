@@ -11,7 +11,7 @@ import {
 
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "../configs/cloudinaryConfig.js"
+import cloudinary from "../configs/cloudinaryConfig.js";
 
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {

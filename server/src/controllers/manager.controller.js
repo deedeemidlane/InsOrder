@@ -100,17 +100,20 @@ export const deleteDish = async (req, res) => {
 
     const deletedDish = await prisma.product.delete({
       where: {
-        id: dishId
-      }
+        id: dishId,
+      },
     });
-    
+
     if (deletedDish) {
       const imageSource = deletedDish.image;
 
-      const imagePublicId = imageSource.substring(imageSource.indexOf('/') + 1, imageSource.lastIndexOf('.'));
+      const imagePublicId = imageSource.substring(
+        imageSource.indexOf("/") + 1,
+        imageSource.lastIndexOf("."),
+      );
       // console.log("imagePublicId: ", imagePublicId);
       // console.log("-----------");
-      
+
       const result = await cloudinary.uploader.destroy(imagePublicId);
       // console.log("delete cloudinary image result: ", result);
       // console.log("-----------");
@@ -119,12 +122,11 @@ export const deleteDish = async (req, res) => {
     } else {
       res.status(400).json({ error: "Dữ liệu không hợp lệ" });
     }
-
   } catch (error) {
     console.log("Error in getShopInfo controller: ", error.message);
     res.status(500).json({ error: "Lỗi hệ thống" });
   }
-}
+};
 
 export const getMenu = async (req, res) => {
   try {
