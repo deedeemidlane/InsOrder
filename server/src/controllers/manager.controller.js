@@ -1,4 +1,5 @@
 // import cloudinary from "../configs/cloudinaryConfig.js";
+import cloudinary from "../configs/cloudinaryConfig.js";
 import prisma from "../db/prisma.js";
 import bcryptjs from "bcryptjs";
 
@@ -42,7 +43,7 @@ export const createDish = async (req, res) => {
 
     const { name, price } = req.body;
 
-    console.log("req.file: ", req.file);
+    // console.log("req.file: ", req.file);
 
     // const image = req.file.path;
 
@@ -86,6 +87,44 @@ export const createDish = async (req, res) => {
     res.status(500).json({ error: "Lỗi hệ thống", message: error.message });
   }
 };
+
+export const deleteDish = async (req, res) => {
+  try {
+    if (req.payload.role !== "MANAGER") {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized - Not manager token" });
+    }
+
+    const { dishId } = req.body;
+
+    const deletedDish = await prisma.product.delete({
+      where: {
+        id: dishId
+      }
+    });
+    
+    if (deletedDish) {
+      const imageSource = deletedDish.image;
+
+      const imagePublicId = imageSource.substring(imageSource.indexOf('/') + 1, imageSource.lastIndexOf('.'));
+      // console.log("imagePublicId: ", imagePublicId);
+      // console.log("-----------");
+      
+      const result = await cloudinary.uploader.destroy(imagePublicId);
+      // console.log("delete cloudinary image result: ", result);
+      // console.log("-----------");
+
+      res.status(201).json({ message: "Xoá món thành công!" });
+    } else {
+      res.status(400).json({ error: "Dữ liệu không hợp lệ" });
+    }
+
+  } catch (error) {
+    console.log("Error in getShopInfo controller: ", error.message);
+    res.status(500).json({ error: "Lỗi hệ thống" });
+  }
+}
 
 export const getMenu = async (req, res) => {
   try {

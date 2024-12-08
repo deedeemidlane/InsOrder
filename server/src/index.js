@@ -30,6 +30,10 @@ app.use("/api/manager", managerRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/customer", customerRoutes);
 
+app.get("/", (req, res) => {
+  res.status(201).json({ message: "Welcome to InsOrder API" });
+})
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

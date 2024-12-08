@@ -1,4 +1,11 @@
-import { CircleUser, Menu, Store, ChefHat, Users } from "lucide-react";
+import {
+  CircleUser,
+  Menu,
+  Store,
+  ChefHat,
+  Users,
+  ExternalLink,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -188,8 +195,10 @@ export default function ManagerPage() {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
+
+        {/* Main content */}
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-5 md:gap-8 bg-muted/40">
-          <div className="mx-auto grid max-w-[60rem] flex-1 auto-rows-max gap-4">
+          <div className="mx-auto grid max-w-[72rem] flex-1 auto-rows-max gap-4">
             {loading ? (
               <Spinner size="xl" color="failure" className="mt-10" />
             ) : (
@@ -213,17 +222,17 @@ export default function ManagerPage() {
                             width="84"
                           />
                         </div>
-                        <div className="flex items-center col-span-2">
+                        <div className="flex items-center col-span-3">
                           <div>
-                            <h1 className="font-semibold text-xl">
+                            <h1 className="font-semibold text-xl mb-1">
                               {shopInfo?.shop.name}
                             </h1>
                             <a
-                              href={`http://localhost:5173/shop/public/${shopInfo?.shop.shopUrl}`}
-                              className="text-blue-600 hover:border-b-2 hover:border-b-blue-600"
+                              href={`${import.meta.env.VITE_BASE_URL}/shop/public/${shopInfo?.shop.shopUrl}`}
+                              className="text-blue-600 hover:border-b-2 hover:border-b-blue-600 flex gap-2"
                               target="_blank"
                             >
-                              {`http://localhost:5173/shop/public/${shopInfo?.shop.shopUrl}`}
+                              Link đặt món <ExternalLink className="w-4" />
                             </a>
                           </div>
                         </div>
@@ -342,7 +351,7 @@ export default function ManagerPage() {
                     </CardContent>
                     <CardFooter>
                       <div className="gap-2 md:flex w-full">
-                        <Button size="sm" className="w-full">
+                        <Button size="sm" className="w-full max-md:mb-2">
                           Lưu thay đổi
                         </Button>
                         <ChangePasswordModal />

@@ -184,7 +184,10 @@ export default function MenuPage() {
               <FlowbiteCard className="sm:pr-8" key={product.id}>
                 <div className="flex gap-4">
                   <img
-                    src={product.image}
+                    src={
+                      `http://res.cloudinary.com/${import.meta.env.VITE_CLOUD_NAME}/image/upload/` +
+                      product.image
+                    }
                     alt="product image"
                     className="h-24 w-24 object-cover border-2 rounded-md"
                   />

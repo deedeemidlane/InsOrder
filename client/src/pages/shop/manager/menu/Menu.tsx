@@ -42,6 +42,7 @@ import useGetMenu from "@/hooks/manager/useGetMenu";
 import { formatDate, formatPriceInVND } from "@/utils/helperFunctions";
 import { Spinner } from "flowbite-react";
 import useCreateDish from "@/hooks/manager/useCreateDish";
+import useDeleteDish from "@/hooks/manager/useDeleteDish";
 
 type Product = {
   id: number;
@@ -67,6 +68,7 @@ export default function MenuManagementPage() {
 
   const { loading: getMenuLoading, getMenu } = useGetMenu();
   const { loading: createDishLoading, createDish } = useCreateDish();
+  const { loading: deleteDishLoading, deleteDish } = useDeleteDish();
 
   const [menu, setMenu] = useState<Product[]>([]);
 
@@ -94,6 +96,12 @@ export default function MenuManagementPage() {
 
     setOpenAddDishModal(false);
 
+    setToggleReRender(!toggleReRender);
+  };
+
+  const handleDeleteDish = async (dishId: number) => {
+    console.log("dishId: ", dishId);
+    await deleteDish(dishId);
     setToggleReRender(!toggleReRender);
   };
 
@@ -209,6 +217,8 @@ export default function MenuManagementPage() {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
+
+        {/* Main content */}
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 sm:pt-4 md:gap-8">
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
@@ -218,7 +228,7 @@ export default function MenuManagementPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {getMenuLoading ? (
+              {getMenuLoading || deleteDishLoading ? (
                 <div className="w-full text-center">
                   <Spinner size="lg" />
                 </div>
@@ -299,7 +309,11 @@ export default function MenuManagementPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                                  <DropdownMenuItem>Xóa</DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteDish(product.id)}
+                                  >
+                                    Xóa
+                                  </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
