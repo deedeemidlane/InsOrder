@@ -4,15 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec node src/index.js"
+    "dev": "nodemon --watch src --exec node src/index.js",
+    "build": "rimraf dist && babel src --out-dir dist  --copy-files",
+    "start": "node dist/index.js"
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.26.4",
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
     "nodemon": "^3.1.4",
-    "prettier": "3.3.3"
+    "prettier": "3.3.3",
+    "rimraf": "^6.0.1"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
