@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src --exec node src/index.js",
-    "build": "rimraf dist && babel src --out-dir dist  --copy-files",
+    "build": "babel src --out-dir dist  --copy-files",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -16,8 +16,7 @@
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
     "nodemon": "^3.1.4",
-    "prettier": "3.3.3",
-    "rimraf": "^6.0.1"
+    "prettier": "3.3.3"
   },
   "dependencies": {
     "@prisma/client": "^5.18.0",
