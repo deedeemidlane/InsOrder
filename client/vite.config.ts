@@ -1,23 +1,12 @@
 import path from "path";
 import react from "@vitejs/plugin-react";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 
-export default ({ mode }: { mode: string }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
-
-  return defineConfig({
-    plugins: [react()],
-    server: {
-      proxy: {
-        "/api": {
-          target: process.env.VITE_API_BASE_URL,
-        },
-      },
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./src"),
-      },
-    },
-  });
-};
+  },
+});

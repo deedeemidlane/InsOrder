@@ -1,3 +1,4 @@
+import { getToken } from "@/services/token";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -8,11 +9,17 @@ const useCreateShop = () => {
   const createShop = async (inputs: {}) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/create-shop", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(inputs),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/admin/create-shop`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getToken(),
+          },
+          body: JSON.stringify(inputs),
+        },
+      );
 
       const data = await res.json();
       console.log(data);

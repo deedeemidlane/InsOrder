@@ -1,3 +1,4 @@
+import { getToken } from "@/services/token";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -7,11 +8,17 @@ const useUpdateOrderStatus = () => {
   const updateOrderStatus = async (orderId: number) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/staff/update-order-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/staff/update-order-status`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getToken(),
+          },
+          body: JSON.stringify({ orderId }),
+        },
+      );
 
       const data = await res.json();
       console.log(data);

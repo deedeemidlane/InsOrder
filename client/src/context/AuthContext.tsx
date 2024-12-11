@@ -1,3 +1,4 @@
+import { getToken } from "@/services/token";
 import {
   createContext,
   Dispatch,
@@ -33,7 +34,19 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchAuthUser = async () => {
       try {
-        const res = await fetch("/api/auth/user");
+        console.log("Bearer " + getToken());
+
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/auth/user`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + getToken(),
+            },
+          },
+        );
+        console.log("res: ", res);
+
         const data = await res.json();
 
         if (!res.ok) {

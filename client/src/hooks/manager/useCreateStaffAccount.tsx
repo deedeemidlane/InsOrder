@@ -1,3 +1,4 @@
+import { getToken } from "@/services/token";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -7,11 +8,17 @@ const useCreateStaffAccount = () => {
   const createStaffAccount = async (inputs: {}) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/manager/create-staff-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(inputs),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/manager/create-staff-account`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + getToken(),
+          },
+          body: JSON.stringify(inputs),
+        },
+      );
 
       const data = await res.json();
       console.log(data);

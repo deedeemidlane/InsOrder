@@ -1,6 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { getToken } from "@/services/token";
 
 const useCreateDish = () => {
   const [loading, setLoading] = useState(false);
@@ -9,9 +10,16 @@ const useCreateDish = () => {
     try {
       setLoading(true);
 
-      const res = await axios.post("/api/manager/create-dish", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/manager/create-dish`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + getToken(),
+          },
+        },
+      );
 
       console.log(res);
 

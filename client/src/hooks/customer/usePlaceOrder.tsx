@@ -17,11 +17,14 @@ const usePlaceOrder = () => {
   ) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/customer/place-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerName, tableNo, shopUrl, orderItems }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/customer/place-order`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customerName, tableNo, shopUrl, orderItems }),
+        },
+      );
 
       const data = await res.json();
       console.log(data);

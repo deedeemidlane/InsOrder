@@ -7,11 +7,14 @@ const useGetOrder = () => {
   const getOrder = async (orderId: number, shopUrl: string) => {
     try {
       setLoading(true);
-      const res = await fetch("/api/customer/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, shopUrl }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/customer/order`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId, shopUrl }),
+        },
+      );
 
       const data = await res.json();
       console.log(data);

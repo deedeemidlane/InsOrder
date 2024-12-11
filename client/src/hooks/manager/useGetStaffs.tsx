@@ -1,3 +1,4 @@
+import { getToken } from "@/services/token";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -7,7 +8,15 @@ const useGetStaffs = () => {
   const getStaffs = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/manager/staffs");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/manager/staffs`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + getToken(),
+          },
+        },
+      );
 
       const data = await res.json();
       console.log(data);
