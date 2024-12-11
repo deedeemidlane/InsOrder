@@ -5,12 +5,12 @@ const generateToken = (payload, res) => {
     expiresIn: "15d",
   });
 
-  res.cookie("jwt", token, {
-    maxAge: 15 * 24 * 60 * 60 * 1000, // miliseconds
-    httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV !== "development", // HTTPS
-  });
+  // res.cookie("jwt", token, {
+  //   maxAge: 15 * 24 * 60 * 60 * 1000, // miliseconds
+  //   httpOnly: true,
+  //   sameSite: "strict",
+  //   secure: process.env.NODE_ENV !== "development", // HTTPS
+  // });
 
   return token;
 };

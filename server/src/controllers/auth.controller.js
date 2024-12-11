@@ -65,9 +65,9 @@ export const login = async (req, res) => {
       shopId: user.shopId,
     };
 
-    generateToken(payload, res);
+    const token = generateToken(payload, res);
 
-    res.status(200).json(payload);
+    res.status(200).json({ token: token, payload: payload });
   } catch (error) {
     console.log("Error in login controller: ", error.message);
     res.status(500).json({ error: "Lỗi hệ thống" });
