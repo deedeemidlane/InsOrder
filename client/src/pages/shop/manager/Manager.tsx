@@ -228,7 +228,7 @@ export default function ManagerPage() {
                               {shopInfo?.shop.name}
                             </h1>
                             <a
-                              href={`${import.meta.env.VITE_BASE_URL}/shop/public/${shopInfo?.shop.shopUrl}`}
+                              href={`/shop/public/${shopInfo?.shop.shopUrl}`}
                               className="text-blue-600 hover:border-b-2 hover:border-b-blue-600 flex gap-2"
                               target="_blank"
                             >
