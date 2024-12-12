@@ -90,8 +90,6 @@ export default function MenuManagementPage() {
     formData.append("name", name);
     formData.append("price", price.toString());
 
-    console.log(formData);
-
     await createDish(formData);
 
     setOpenAddDishModal(false);
@@ -100,7 +98,6 @@ export default function MenuManagementPage() {
   };
 
   const handleDeleteDish = async (dishId: number) => {
-    console.log("dishId: ", dishId);
     await deleteDish(dishId);
     setToggleReRender(!toggleReRender);
   };

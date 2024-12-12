@@ -30,9 +30,6 @@ export default function QrPaymentPage() {
   useEffect(() => {
     const fetchShop = async () => {
       const fetchedShop = await getShopInfo(shopUrl);
-
-      console.log("fetched shop: ", fetchedShop);
-
       setShop(fetchedShop);
     };
 
@@ -91,8 +88,6 @@ export default function QrPaymentPage() {
         template: "print",
       };
 
-      console.log("values: ", values);
-
       // const resQR = await axios.post(
       //   `https://api.vietqr.io/v2/generate`,
       //   values,
@@ -110,11 +105,7 @@ export default function QrPaymentPage() {
 
       const resQR = await res.json();
 
-      console.log("resQR: ", resQR);
-
       const qrDataURL = resQR.data;
-
-      console.log("QR data: ", qrDataURL);
 
       setQRImageData(qrDataURL["qrDataURL"]);
     };
@@ -135,8 +126,6 @@ export default function QrPaymentPage() {
       shopUrl,
       cart,
     );
-
-    console.log(res);
 
     const key = shopUrl ? shopUrl : "";
 

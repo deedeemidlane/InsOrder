@@ -34,8 +34,6 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchAuthUser = async () => {
       try {
-        console.log("Bearer " + getToken());
-
         const res = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/auth/user`,
           {
@@ -45,7 +43,6 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
             },
           },
         );
-        console.log("res: ", res);
 
         const data = await res.json();
 

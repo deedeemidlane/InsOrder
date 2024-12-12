@@ -15,8 +15,6 @@ export default function ShopInfoPage() {
   useEffect(() => {
     const fetchMenu = async () => {
       const fetchedMenu = await getMenu(shopUrl);
-      console.log(fetchedMenu);
-
       setShopName(fetchedMenu.shopName);
     };
 

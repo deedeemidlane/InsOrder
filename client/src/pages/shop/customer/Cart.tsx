@@ -11,6 +11,7 @@ import {
   X,
   Plus,
   Minus,
+  Inbox,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -25,8 +26,6 @@ export default function CartPage() {
   useEffect(() => {
     const fetchMenu = async () => {
       const fetchedMenu = await getMenu(shopUrl);
-      console.log(fetchedMenu);
-
       setShopName(fetchedMenu.shopName);
     };
 
@@ -189,8 +188,8 @@ export default function CartPage() {
 
       {/* Main content */}
       <section className="bg-white my-20">
-        <div className="mx-auto max-w-screen-xl px-4 2xl:px-0 sm:pt-8">
-          <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
+        <div className="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-16 sm:pt-8">
+          <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl underline underline-offset-8">
             Giỏ hàng
           </h2>
 
@@ -199,171 +198,186 @@ export default function CartPage() {
               <Spinner size="xl" color="failure" />
             </main>
           ) : (
-            <div className="mt-2 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
-              <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
-                <div className="space-y-6">
-                  {cart.map((product, index) => (
-                    <div key={index}>
-                      <div className="hidden md:block rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
-                        <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-                          <div className="shrink-0 md:order-1">
-                            <img
-                              src={product.image}
-                              alt="product image"
-                              className="h-20 w-20 rounded-md border-2"
-                            />
-                          </div>
-
-                          <div className="flex items-center justify-between md:order-3 md:justify-end">
-                            <div className="flex items-center">
-                              {/* Decrease button */}
-                              <button
-                                type="button"
-                                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
-                                onClick={() => minusQuantity(product.id)}
-                              >
-                                <Minus className="h-3" />
-                              </button>
-                              <div className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white">
-                                {product.quantity}
+            <>
+              {cart.length > 0 ? (
+                <div className="mt-2 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+                  <div className="mx-auto w-full lg:max-w-xl xl:max-w-3xl">
+                    <div className="space-y-6">
+                      {cart.map((product, index) => (
+                        <div key={index}>
+                          <div className="hidden md:block rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
+                            <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
+                              <div className="shrink-0 md:order-1">
+                                <img
+                                  src={
+                                    `http://res.cloudinary.com/${import.meta.env.VITE_CLOUD_NAME}/image/upload/` +
+                                    product.image
+                                  }
+                                  alt="product image"
+                                  className="h-20 w-20 rounded-md border-2"
+                                />
                               </div>
-                              {/* Increase button */}
-                              <button
-                                type="button"
-                                className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
-                                onClick={() => addQuantity(product.id)}
-                              >
-                                <Plus className="h-3" />
-                              </button>
-                            </div>
-                            <div className="text-end md:order-4 md:w-32">
-                              <p className="text-base font-bold text-gray-900 dark:text-white">
-                                {formatPriceInVND(
-                                  product.price * product.quantity,
-                                )}
-                              </p>
+
+                              <div className="flex items-center justify-between md:order-3 md:justify-end">
+                                <div className="flex items-center">
+                                  {/* Decrease button */}
+                                  <button
+                                    type="button"
+                                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                    onClick={() => minusQuantity(product.id)}
+                                  >
+                                    <Minus className="h-3" />
+                                  </button>
+                                  <div className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white">
+                                    {product.quantity}
+                                  </div>
+                                  {/* Increase button */}
+                                  <button
+                                    type="button"
+                                    className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                    onClick={() => addQuantity(product.id)}
+                                  >
+                                    <Plus className="h-3" />
+                                  </button>
+                                </div>
+                                <div className="text-end md:order-4 md:w-32">
+                                  <p className="text-base font-bold text-gray-900 dark:text-white">
+                                    {formatPriceInVND(
+                                      product.price * product.quantity,
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
+                                <div className="text-xl font-medium text-gray-900">
+                                  {product.name}
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                  <button
+                                    type="button"
+                                    className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
+                                    onClick={() => removeProduct(product.id)}
+                                  >
+                                    <X className="me-1.5 h-5 w-5" />
+                                    Xóa
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
 
-                          <div className="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
-                            <div className="text-xl font-medium text-gray-900">
-                              {product.name}
-                            </div>
+                          {/* Mobile cart */}
+                          <div className="md:hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className="shrink-0 md:order-1">
+                                  <img
+                                    src={
+                                      `http://res.cloudinary.com/${import.meta.env.VITE_CLOUD_NAME}/image/upload/` +
+                                      product.image
+                                    }
+                                    alt="product image"
+                                    className="h-20 w-20 rounded-md border-2"
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  <div className="text-md font-medium text-gray-900">
+                                    {product.name}
+                                  </div>
+                                  <div className="flex items-center">
+                                    {/* Decrease button */}
+                                    <button
+                                      type="button"
+                                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                      onClick={() => minusQuantity(product.id)}
+                                    >
+                                      <Minus className="h-3" />
+                                    </button>
+                                    <div className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white">
+                                      {product.quantity}
+                                    </div>
+                                    {/* Increase button */}
+                                    <button
+                                      type="button"
+                                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
+                                      onClick={() => addQuantity(product.id)}
+                                    >
+                                      <Plus className="h-3" />
+                                    </button>
+                                  </div>
+                                  <div className="md:order-4 md:w-32">
+                                    <p className="text-base font-bold text-gray-900 dark:text-white">
+                                      {formatPriceInVND(
+                                        product.price * product.quantity,
+                                      )}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
 
-                            <div className="flex items-center gap-4">
-                              <button
-                                type="button"
-                                className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => removeProduct(product.id)}
                               >
-                                <X className="me-1.5 h-5 w-5" />
-                                Xóa
-                              </button>
+                                <X className="h-5 text-red-600" />
+                              </Button>
                             </div>
                           </div>
+                          {/* End mobile cart */}
                         </div>
-                      </div>
-
-                      {/* Mobile cart */}
-                      <div className="md:hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="shrink-0 md:order-1">
-                              <img
-                                src={product.image}
-                                alt="product image"
-                                className="h-20 w-20 rounded-md border-2"
-                              />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                              <div className="text-md font-medium text-gray-900">
-                                {product.name}
-                              </div>
-                              <div className="flex items-center">
-                                {/* Decrease button */}
-                                <button
-                                  type="button"
-                                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
-                                  onClick={() => minusQuantity(product.id)}
-                                >
-                                  <Minus className="h-3" />
-                                </button>
-                                <div className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white">
-                                  {product.quantity}
-                                </div>
-                                {/* Increase button */}
-                                <button
-                                  type="button"
-                                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 "
-                                  onClick={() => addQuantity(product.id)}
-                                >
-                                  <Plus className="h-3" />
-                                </button>
-                              </div>
-                              <div className="md:order-4 md:w-32">
-                                <p className="text-base font-bold text-gray-900 dark:text-white">
-                                  {formatPriceInVND(
-                                    product.price * product.quantity,
-                                  )}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeProduct(product.id)}
-                          >
-                            <X className="h-5 text-red-600" />
-                          </Button>
-                        </div>
-                      </div>
-                      {/* End mobile cart */}
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Order summary */}
-              <div className="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
-                <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
-                  <p className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Tổng kết hóa đơn
-                  </p>
-
-                  <div className="space-y-4">
-                    <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
-                      <dt className="text-base font-bold text-gray-900 dark:text-white">
-                        Tổng
-                      </dt>
-                      <dd className="text-base font-bold text-gray-900 dark:text-white">
-                        {formatPriceInVND(
-                          cart.reduce(
-                            (accumulator, currentValue) =>
-                              accumulator +
-                              currentValue.price * currentValue.quantity,
-                            0,
-                          ),
-                        )}
-                      </dd>
-                    </dl>
                   </div>
 
-                  <div className="flex flex-col gap-3">
-                    <Link to="../confirm-payment">
-                      <Button className="w-full">Thanh toán</Button>
-                    </Link>
+                  {/* Order summary */}
+                  <div className="mx-auto mt-6 flex-1 space-y-6 lg:mt-0 w-full">
+                    <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+                      <p className="text-xl font-semibold text-gray-900 dark:text-white">
+                        Tổng kết hóa đơn
+                      </p>
 
-                    <Link to="../">
-                      <Button className="w-full" variant="secondary">
-                        Quay lại
-                      </Button>
-                    </Link>
+                      <div className="space-y-4">
+                        <dl className="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
+                          <dt className="text-base font-bold text-gray-900 dark:text-white">
+                            Tổng
+                          </dt>
+                          <dd className="text-base font-bold text-gray-900 dark:text-white">
+                            {formatPriceInVND(
+                              cart.reduce(
+                                (accumulator, currentValue) =>
+                                  accumulator +
+                                  currentValue.price * currentValue.quantity,
+                                0,
+                              ),
+                            )}
+                          </dd>
+                        </dl>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <Link to="../confirm-payment">
+                          <Button className="w-full">Thanh toán</Button>
+                        </Link>
+
+                        <Link to="../">
+                          <Button className="w-full" variant="secondary">
+                            Quay lại
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              ) : (
+                <div className="flex flex-col items-center pt-10 text-gray-400">
+                  <Inbox className="w-24 h-24" />
+                  <h3 className=" text-2xl font-bold">Giỏ hàng hiện trống</h3>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

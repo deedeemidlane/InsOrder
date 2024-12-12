@@ -1,5 +1,5 @@
 import { Button, Spinner } from "flowbite-react";
-import { Info, Search, ShoppingCart, Utensils } from "lucide-react";
+import { Inbox, Info, Search, ShoppingCart, Utensils } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Button as FlowbiteButton, Card as FlowbiteCard } from "flowbite-react";
 import { formatPriceInVND } from "@/utils/helperFunctions";
@@ -29,8 +29,6 @@ export default function MenuPage() {
   useEffect(() => {
     const fetchMenu = async () => {
       const fetchedMenu = await getMenu(shopUrl);
-      console.log(fetchedMenu);
-
       setMenu(fetchedMenu.products);
       setShopName(fetchedMenu.shopName);
     };
@@ -179,38 +177,45 @@ export default function MenuPage() {
         </main>
       ) : (
         <div className="flex justify-center items-center my-20">
-          <div className="grid md:grid-cols-2 gap-4 xl:gap-8 my-4">
-            {menu?.map((product) => (
-              <FlowbiteCard className="sm:pr-8" key={product.id}>
-                <div className="flex gap-4">
-                  <img
-                    src={
-                      `http://res.cloudinary.com/${import.meta.env.VITE_CLOUD_NAME}/image/upload/` +
-                      product.image
-                    }
-                    alt="product image"
-                    className="h-24 w-24 object-cover border-2 rounded-md"
-                  />
-                  <div className="flex flex-col justify-between">
-                    <h3 className="text-xl font-semibold">{product.name}</h3>
-                    <p>{formatPriceInVND(product.price)}</p>
-                    <div>
-                      <FlowbiteButton
-                        size="xs"
-                        outline
-                        onClick={() => addToCart(product.id)}
-                      >
-                        <div className="flex items-center">
-                          <BiSolidCartAdd className="sm:mr-1 text-xl" />
-                          <span>Thêm vào giỏ hàng</span>
-                        </div>
-                      </FlowbiteButton>
+          {menu && menu.length > 0 ? (
+            <div className="grid md:grid-cols-2 gap-4 xl:gap-8 my-4">
+              {menu?.map((product) => (
+                <FlowbiteCard className="sm:pr-8" key={product.id}>
+                  <div className="flex gap-4">
+                    <img
+                      src={
+                        `http://res.cloudinary.com/${import.meta.env.VITE_CLOUD_NAME}/image/upload/` +
+                        product.image
+                      }
+                      alt="product image"
+                      className="h-24 w-24 object-cover border-2 rounded-md"
+                    />
+                    <div className="flex flex-col justify-between">
+                      <h3 className="text-xl font-semibold">{product.name}</h3>
+                      <p>{formatPriceInVND(product.price)}</p>
+                      <div>
+                        <FlowbiteButton
+                          size="xs"
+                          outline
+                          onClick={() => addToCart(product.id)}
+                        >
+                          <div className="flex items-center">
+                            <BiSolidCartAdd className="sm:mr-1 text-xl" />
+                            <span>Thêm vào giỏ hàng</span>
+                          </div>
+                        </FlowbiteButton>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </FlowbiteCard>
-            ))}
-          </div>
+                </FlowbiteCard>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center pt-20 text-gray-400">
+              <Inbox className="w-28 h-28" />
+              <h3 className=" text-2xl font-bold">Menu hiện trống</h3>
+            </div>
+          )}
         </div>
       )}
     </>

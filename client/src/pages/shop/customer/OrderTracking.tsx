@@ -115,8 +115,6 @@ export default function OrderTrackingPage() {
   useEffect(() => {
     const fetchMenu = async () => {
       const fetchedMenu = await getMenu(shopUrl);
-      console.log(fetchedMenu);
-
       setShopName(fetchedMenu.shopName);
       setMenu(fetchedMenu.products);
     };
